@@ -1,4 +1,4 @@
-package io.github.chrisruffalo.ee6config.resources;
+package io.github.chrisruffalo.ee6config.resources.configuration;
 
 import io.github.chrisruffalo.ee6config.annotations.Configuration;
 
@@ -22,7 +22,7 @@ import org.slf4j.Logger;
  * @author Chris Ruffalo
  *
  */
-public class ProperiesConfigurationProducer extends AbstractConfigurationProducer {
+public class PropertiesConfigurationProducer extends AbstractConfigurationProducer {
 	
 	@Inject
 	private Logger logger;

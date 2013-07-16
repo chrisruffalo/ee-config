@@ -1,4 +1,4 @@
-package io.github.chrisruffalo.ee6config.resources;
+package io.github.chrisruffalo.ee6config.resources.configuration;
 
 import io.github.chrisruffalo.ee6config.annotations.Configuration;
 import io.github.chrisruffalo.ee6config.support.DeploymentFactory;
