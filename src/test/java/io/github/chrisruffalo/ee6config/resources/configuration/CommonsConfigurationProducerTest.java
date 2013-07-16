@@ -3,14 +3,25 @@ package io.github.chrisruffalo.ee6config.resources.configuration;
 import io.github.chrisruffalo.ee6config.annotations.Configuration;
 import io.github.chrisruffalo.ee6config.support.DeploymentFactory;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import javax.inject.Inject;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import com.google.common.io.ByteStreams;
 
 @RunWith(Arquillian.class)
 public class CommonsConfigurationProducerTest {
@@ -28,6 +39,64 @@ public class CommonsConfigurationProducerTest {
 		;
 
 		return archive;
+	}
+	
+	@BeforeClass
+	public static void moveFilesToTemp() throws IOException {
+		String tempDirPath = System.getProperty("java.io.tmpdir");
+		File tempDir = new File(tempDirPath);
+		
+		// fail if it can't be used
+		if(!tempDir.exists() || !tempDir.isDirectory()) {
+			Assert.fail("Could not find system temporary folder");
+		}
+		
+		// create bases
+		String[] properties = new String[]{
+			"priority1.properties",
+			"priority2.properties",
+			"priority3.properties"
+		};
+		
+		for(String propertyPath : properties) {
+			// get output
+			File outputFile = new File(tempDir.getAbsolutePath() + File.separator + propertyPath);
+			
+			// delete output file if it exists
+			if(outputFile.exists()) {
+				outputFile.delete();
+			}
+			
+			// create file
+			outputFile.createNewFile();
+			
+			OutputStream output;
+			try {
+				output = new FileOutputStream(outputFile);
+			} catch (FileNotFoundException e) {
+				output = new ByteArrayOutputStream();
+			}
+			
+			// get input
+			InputStream input = 
+				Thread.currentThread().getContextClassLoader().getResourceAsStream("properties/" + propertyPath);
+			
+			// copy
+			ByteStreams.copy(input, output);
+			
+			// flush output
+			try {
+				output.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			// close streams
+			input.close();
+			output.close();
+		}
+		
+		
 	}
 	
 	/**
@@ -136,4 +205,37 @@ public class CommonsConfigurationProducerTest {
 		Assert.assertEquals("true", properties.getString("minor"));
 	}
 	
+	/**
+	 * Test priority ordering with merge.
+	 * <br/>
+	 * This version uses a slightly different ordering
+	 * and it calls out to the filesystem using a system
+	 * property resolved path. 
+	 * <br/>
+	 * Also loads mixed file and resource items
+	 * 
+	 * @param properties
+	 */
+	@Test
+	@Inject
+	public void testMergeFilesWithSystemPropertiesAndMixedResource(@Configuration(
+		paths = {
+			"${java.io.tmpdir}/priority2.properties",
+			"${java.io.tmpdir}/priority1.properties",
+			"resource:properties/priority3.properties"
+		},
+		resolveSystemProperties = true,
+		merge = true
+	) org.apache.commons.configuration.Configuration properties) {
+		Assert.assertNotNull(properties);
+		// this one has content
+		Assert.assertFalse(properties.isEmpty());
+		// check content
+		Assert.assertEquals("value2", properties.getString("common"));
+		Assert.assertEquals("shared", properties.getString("shared"));
+		Assert.assertEquals("one", properties.getString("one"));
+		Assert.assertEquals("two", properties.getString("two"));
+		Assert.assertEquals("three", properties.getString("three"));
+		Assert.assertEquals("true", properties.getString("minor"));
+	}
 }

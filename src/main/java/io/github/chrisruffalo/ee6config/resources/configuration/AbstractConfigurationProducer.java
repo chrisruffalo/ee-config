@@ -173,7 +173,12 @@ public abstract class AbstractConfigurationProducer {
 		// find tokens
 		String[] foundTokens = StringUtils.substringsBetween(fullString, "${", "}");
 		
-		// output string
+		// if no tokens are found, leave
+		if(foundTokens == null || foundTokens.length == 0) {
+			return fullString;
+		}
+		
+		// output string manipulation
 		String output = fullString;
 		
 		// for each token, resolve
@@ -200,11 +205,11 @@ public abstract class AbstractConfigurationProducer {
 			// now we have a non-null property that
 			// is different than the initial token
 			// so now we have something to replace with
-			output = StringUtils.replace(output, token, property);
+			output = StringUtils.replace(output, "${" + token + "}", property);
 		}
 		
 		// log
-		this.logger.debug("Resolved '{}' to '{}'", fullString, output);
+		this.logger.trace("Resolved '{}' to '{}'", fullString, output);
 		
 		// return resolved output
 		return output;
@@ -219,16 +224,19 @@ public abstract class AbstractConfigurationProducer {
 	 * @return input stream for the given file 
 	 */
 	private InputStream getConfigurationAtPath(String path) {
+		// create file pointer from given path
 		File file = new File(path);
 		
 		// no file found, return null
 		if(!file.exists() || !file.isFile()) {
+			this.logger.debug("No file found at '{}'", file.getAbsolutePath());
 			return null;
 		}
 		
-		FileInputStream foundFileInputStream;
+		InputStream foundFileInputStream;
 		try {
 			foundFileInputStream = new FileInputStream(file);
+			this.logger.debug("Found file at '{}'", file.getAbsolutePath());
 		} catch (FileNotFoundException e) {
 			this.logger.error("File found with java.io.File but exception thrown: {}", e.getMessage());
 			return null;
