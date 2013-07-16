@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
 
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
@@ -22,51 +21,22 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 
 /**
- * Resolves the {@link Configuration} annotation for injection
- * into the target project.
+ * Core shared logic for loading configuration files
  * 
- * @author Chris Ruffalo
+ * @author Chris Ruffalo <cruffalo@redhat.com>
  *
  */
-public class ConfigurationProducer {
+public abstract class AbstractConfigurationProducer {
 
+	/**
+	 * Simple magic string for resource
+	 * 
+	 */
 	private static final String RESOURCE = "resource:";
-	
+
 	@Inject
 	private Logger logger;
-	
-	/**
-	 * Satisfies injection for java.util.Properties
-	 * 
-	 * @param injectionPoint EE6 injection point
-	 * 
-	 * @return the java.util.Properties loaded from the 
-	 * 		   configuration files (if found)
-	 */
-	@Configuration(paths={})
-	public Properties getProperties(InjectionPoint injectionPoint) {
-		Properties properties = new Properties();
-		
-		// locate configurations
-		Configuration configuration = this.getAnnotation(injectionPoint);
-		List<InputStream> found = this.locate(configuration);
-		
-		// get top result
-		InputStream first = found.get(0);
-		try {
-			// and load properties from it
-			properties.load(first);
-		} catch (IOException e) {
-			this.logger.error("An error occured while loading configuration properties: {}", e.getMessage());
-		}
-		
-		// close streams
-		this.close(found);
-		
-		// return properties
-		return properties;
-	}
-	
+
 	/**
 	 * Mass close of given streams.  Does the best it
 	 * can to ensure all the given streams are closed
@@ -74,7 +44,7 @@ public class ConfigurationProducer {
 	 * 
 	 * @param streams to close
 	 */
-	private void close(Collection<InputStream> streams) {
+	protected void close(Collection<InputStream> streams) {
 		for(InputStream stream : streams) {
 			try {
 				stream.close();
@@ -93,7 +63,7 @@ public class ConfigurationProducer {
 	 * 
 	 * @return configuration annotation
 	 */
-	private Configuration getAnnotation(InjectionPoint injectionPoint) {
+	protected Configuration getAnnotation(InjectionPoint injectionPoint) {
 		Configuration configuration = injectionPoint.getAnnotated().getAnnotation(Configuration.class);
 		return configuration;
 	}
@@ -106,7 +76,7 @@ public class ConfigurationProducer {
 	 * 
 	 * @return List of InputStreams representing the configuration found
 	 */
-	private List<InputStream> locate(Configuration configuration) {
+	protected List<InputStream> locate(Configuration configuration) {
 		// safe but shouldn't really ever be able to get here
 		if(configuration == null) {
 			return emptyResponse();
@@ -115,7 +85,9 @@ public class ConfigurationProducer {
 		String[] paths = configuration.paths();
 		boolean resolve = configuration.resolveSystemProperties();
 		
-		return this.locate(paths, resolve);
+		List<InputStream> streams = this.locate(paths, resolve);
+		
+		return streams;
 	}
 	
 	/**
@@ -168,7 +140,7 @@ public class ConfigurationProducer {
 			
 			// resolve according to if it was found
 			// as a resource or as a normal path
-			if(path.startsWith(ConfigurationProducer.RESOURCE)) {
+			if(path.startsWith(AbstractConfigurationProducer.RESOURCE)) {
 				stream = this.getConfigurationResourceAtPath(path);
 			} else {
 				stream = this.getConfigurationAtPath(path);
@@ -274,11 +246,18 @@ public class ConfigurationProducer {
 	 */
 	private InputStream getConfigurationResourceAtPath(String resourcePath) {
 		
-		// create path to resource by removing prepended "resource:"
-		String resource = StringUtils.removeStart(ConfigurationProducer.RESOURCE, resourcePath);
+		// create path to resource by removing prepended "resource:" if it exists as a prefix
+		String resource = StringUtils.removeStart(resourcePath, AbstractConfigurationProducer.RESOURCE);
 		
 		// get resoruce from context
 		InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
+		
+		// debug logging
+		if(stream == null) {
+			this.logger.trace("No resource found at path '{}' for resource", resource);
+		} else {
+			this.logger.trace("Found resource at path '{}' for resource", resource);
+		}
 		
 		return stream;
 	}

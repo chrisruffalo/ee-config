@@ -24,12 +24,21 @@ import javax.inject.Qualifier;
 public @interface SystemProperty {
 
 	/**
-	 * System Property
+	 * The key to use to look up the system property
 	 * 
 	 * @return Value of the key that will be 
 	 * 		   used to look up the system
 	 * 		   property
 	 */
 	@Nonbinding
-	String value();
+	String key();
+	
+	/**
+	 * The value to use if the system property is null
+	 * 
+	 * @return
+	 */
+	@Nonbinding
+	String defaultValue() default "";
+	
 }

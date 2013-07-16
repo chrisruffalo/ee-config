@@ -11,7 +11,8 @@ import javax.enterprise.util.Nonbinding;
 import javax.inject.Qualifier;
 
 /**
- * Annotation for specifying properties file to load
+ * Annotation for specifying configuration file that
+ * should be loaded.
  *  
  * @author Chris Ruffalo
  * 

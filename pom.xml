@@ -120,7 +120,6 @@
 			<groupId>commons-configuration</groupId>
 			<artifactId>commons-configuration</artifactId>
 			<version>${commons.configuration.version}</version>
-			<scope>provided</scope>
 		</dependency>
 
 		<!-- testing -->
@@ -128,6 +127,7 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>${junit.version}</version>
+			<scope>test</scope>
 		</dependency>
 
 		<!-- Arquillian -->
