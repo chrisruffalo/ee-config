@@ -38,6 +38,11 @@ public final class DeploymentFactory {
 		// commons-configuration and dependencies
 		archive.addAsLibraries(resolver.artifact("commons-configuration:commons-configuration:1.6").resolveAsFiles());
 		
+		// add resources
+		archive.addAsResource("properties/priority1.properties")
+			   .addAsResource("properties/priority2.properties")
+			   .addAsResource("properties/priority3.properties");
+		
 		// return archive
 		return archive;		
 	}

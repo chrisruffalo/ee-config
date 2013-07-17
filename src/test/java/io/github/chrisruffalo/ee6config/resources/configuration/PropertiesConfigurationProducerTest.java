@@ -22,12 +22,7 @@ public class PropertiesConfigurationProducerTest {
 	
 	@Deployment
 	public static WebArchive deployment() {
-		WebArchive archive = DeploymentFactory.createDeployment()
-			// add resources specific to this test
-			.addAsResource("properties/priority1.properties")
-			.addAsResource("properties/priority2.properties")
-		    .addAsResource("properties/priority3.properties")
-		;
+		WebArchive archive = DeploymentFactory.createDeployment();
 
 		return archive;
 	}

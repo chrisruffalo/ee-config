@@ -31,12 +31,7 @@ public class CommonsConfigurationProducerTest {
 	
 	@Deployment
 	public static WebArchive deployment() {
-		WebArchive archive = DeploymentFactory.createDeployment()
-			// add resources specific to this test
-			.addAsResource("properties/priority1.properties")
-			.addAsResource("properties/priority2.properties")
-		    .addAsResource("properties/priority3.properties")
-		;
+		WebArchive archive = DeploymentFactory.createDeployment();
 
 		return archive;
 	}
@@ -237,5 +232,35 @@ public class CommonsConfigurationProducerTest {
 		Assert.assertEquals("two", properties.getString("two"));
 		Assert.assertEquals("three", properties.getString("three"));
 		Assert.assertEquals("true", properties.getString("minor"));
+	}
+	
+	/**
+	 * Test that system properties can be set to not resolve which
+	 * results in not being able to find configuration items with
+	 * system properties in them.
+	 * 
+	 * @param properties
+	 */
+	@Test
+	@Inject
+	public void testMergeFilesWithoutSystemPropertiesAndMixedResource(@Configuration(
+		paths = {
+			"${java.io.tmpdir}/priority2.properties",
+			"${java.io.tmpdir}/priority1.properties",
+			"resource:properties/priority3.properties"
+		},
+		resolveSystemProperties = false,
+		merge = true
+	) org.apache.commons.configuration.Configuration properties) {
+		Assert.assertNotNull(properties);
+		// this one has content
+		Assert.assertFalse(properties.isEmpty());
+		// check content
+		Assert.assertEquals("value3", properties.getString("common"));
+		Assert.assertEquals("shared", properties.getString("shared"));
+		Assert.assertNull(properties.getString("one"));
+		Assert.assertNull(properties.getString("two"));
+		Assert.assertEquals("three", properties.getString("three"));
+		Assert.assertEquals("false", properties.getString("minor"));
 	}
 }
