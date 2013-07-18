@@ -17,7 +17,14 @@ When version 2.0 of the application came along we were very excited to move to E
 
 Sadly, I don't want to code everything from scratch, so the EE6-Config library requires a few things to get started.  First it requires EE6.  It is developed using the JBoss flavor provided by the Maven dependency but there is no reason it shouldn't work on other EE6 implementations.
 
-It also requires SLF4J 1.6.1, Apache Commons Configuration 1.6, and Apache Commons Utilities 1.6.  These utilities provide logging, configuration, and other shared parts that would be difficult to do without.
+It also requires 
+
+* SLF4J 1.6.1
+* Apache Commons Configuration 1.9
+* Apache Commons Utilities 1.9
+* SimpleMagic 1.2
+
+These utilities provide logging, configuration, and other shared parts that would be difficult to do without.  SimpleMagic provides magical support for file types which is used to guess how to load configuration files.
 
 Commons Configuration also provides one of the injectable configuration types to allow you to **directly inject Commons Configuration** right into your application!
 
@@ -167,11 +174,17 @@ public class ConfigureMeAnInputStream {
 	@PostConstruct
 	private void init() {
 		// load configuration from injected input stream
+		// ... logic here ...
+
+		// close input stream
+		configStream.close();
 	}
 }
 ```
 
 In this case you'll need to take an extra step to get your configuration file by loading it into whatever mechanism you choose.  You'll also notice that the 'merge' flag is missing.  When injecting a plain stream the merge flag does nothing.
+
+**It is important to note** that you must, MUST, close the InputStream yourself when you are done with them.
 
 #### Example 4: InputStream - The List-ening
 
@@ -187,11 +200,17 @@ public class ConfigureMeAnInputStream {
 		},
 		resolveSystemProperties = true, // resolves system properties in paths
 	)
-	private List<InputStream> configStream; 
+	private List<InputStream> configStreams; 
 	
 	@PostConstruct
 	private void init() {
 		// load configuration from injected input stream
+		// ... logic here ...
+
+		// close streams
+		for(InputStream stream : configStreams) {
+			stream.close();
+		}
 	}
 }
 ```
@@ -216,12 +235,13 @@ public class MyCustomConfigurationProducer extends AbstractConfigurationProducer
 		
 		// next get the input streams that match the configuration paths given
 		// this method will ALWAYS return a non-null list with AT LEAST ONE
-		// input stream.  (the InputStream may have no content.)  
-		List<InputStream> streams = this.locate(annotation);
+		// input source.  (The configuration source may have no content.)
+		// see IConfigurationSource for more details  
+		List<IConfigurationSource> sources = this.locate(annotation);		
 		
-		// implement custom logic here
-		MyCustomConfigurationType config = MyCustomConfigurationType.load(streams);
-		
+		// implement custom logic to load the input stream here
+		MyCustomConfigurationType config = MyCustomConfigurationType.load(sources);
+
 		// return configuration
 		return config;
 	}

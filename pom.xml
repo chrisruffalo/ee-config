@@ -18,7 +18,7 @@
 		<jboss-as.version>7.1.1.Final</jboss-as.version>
 		<slf4j.version>1.6.1</slf4j.version> <!-- from JBoss Logging 3.1.X.GA and Hibernate Validator -->
 		<guava.version>11.0.2</guava.version> <!-- bundled with jboss as 7.1 and eap 6.0x -->
-		<commons.configuration.version>1.6</commons.configuration.version> <!-- bundled with jboss as 7.1 and eap 6.0x -->
+		<commons.configuration.version>1.9</commons.configuration.version>
 
 		<!-- arquillian testing -->
 		<arquillian.version>1.0.3.Final</arquillian.version>
@@ -110,8 +110,15 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<version>1.0.9</version>
+			<version>1.0.13</version>
 			<scope>test</scope>
+		</dependency>
+		
+		<!-- magical mime types -->
+		<dependency>
+		    <groupId>com.j256.simplemagic</groupId>
+		    <artifactId>simplemagic</artifactId>
+		    <version>1.2</version>
 		</dependency>
 
 		<!-- configuration -->
@@ -121,7 +128,7 @@
 			<version>${commons.configuration.version}</version>
 		</dependency>
 		
-		<!-- guava -->
+		<!-- guava is used to make copying files easier during test -->
 		<dependency>
 		    <groupId>com.google.guava</groupId>
 		    <artifactId>guava</artifactId>
@@ -217,7 +224,6 @@
 				<!-- use java 6 through maven compiler 2.5 -->
 				<plugin>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>2.5.1</version>
 					<configuration>
 						<verbose>true</verbose>
 						<source>1.6</source>

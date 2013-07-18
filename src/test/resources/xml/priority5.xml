@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<config>
+	<priority>five</priority>
+	<value5>5</value5>
+	<shared>shared</shared>
+</config>

@@ -7,6 +7,9 @@
 		</encoder>
 	</appender>
 
+	<!-- configuration is verbose as well -->
+    <logger name="ch.qos" level="ERROR" additivity="false"/>
+
 	<root level="info">
 		<appender-ref ref="STDOUT" />
 	</root>

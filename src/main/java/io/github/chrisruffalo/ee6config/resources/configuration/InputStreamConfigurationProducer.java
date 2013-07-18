@@ -1,13 +1,19 @@
 package io.github.chrisruffalo.ee6config.resources.configuration;
 
+import io.github.chrisruffalo.ee6config.annotations.Configuration;
+import io.github.chrisruffalo.ee6config.resources.configuration.source.IConfigurationSource;
+
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import io.github.chrisruffalo.ee6config.annotations.Configuration;
-
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
 
 /**
  * Produces raw InputStreams for implementing custom configuration
@@ -18,6 +24,9 @@ import javax.enterprise.inject.spi.InjectionPoint;
  */
 public class InputStreamConfigurationProducer extends AbstractConfigurationProducer {
 
+	@Inject
+	private Logger logger;
+	
 	@Produces
 	@Configuration(paths={})
 	public InputStream getInputStream(InjectionPoint injectionPoint) {
@@ -25,10 +34,10 @@ public class InputStreamConfigurationProducer extends AbstractConfigurationProdu
 		Configuration annotation = this.getAnnotation(injectionPoint);
 		
 		// get input streams
-		List<InputStream> streams = this.locate(annotation);
+		List<IConfigurationSource> sources = this.locate(annotation);
 		
 		// return the first stream
-		return streams.get(0);
+		return sources.get(0).stream();
 	}
 	
 	@Produces
@@ -37,8 +46,26 @@ public class InputStreamConfigurationProducer extends AbstractConfigurationProdu
 		// get configuration annotation
 		Configuration annotation = this.getAnnotation(injectionPoint);
 		
+		// get sources
+		List<IConfigurationSource> sources = this.locate(annotation);
+		
 		// get input streams
-		List<InputStream> streams = this.locate(annotation);
+		List<InputStream> streams = new ArrayList<InputStream>(sources.size());
+		
+		// go through the sources and add them
+		for(IConfigurationSource source : sources) {
+			if(!source.available()) {
+				this.logger.info("Source is not available: {}", source.getPath());
+				continue;
+			}
+			this.logger.info("Source available: {}", source.getPath());
+			streams.add(source.stream());
+		}
+		
+		// per the contract, if the streams list is empty, add one
+		if(streams.isEmpty()) {
+			streams.add(new ByteArrayInputStream(new byte[0]));
+		}
 		
 		// return the first stream
 		return Collections.unmodifiableList(streams);	

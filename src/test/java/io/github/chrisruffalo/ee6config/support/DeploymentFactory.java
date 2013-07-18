@@ -37,11 +37,15 @@ public final class DeploymentFactory {
 		
 		// commons-configuration and dependencies
 		archive.addAsLibraries(resolver.artifact("commons-configuration:commons-configuration:1.6").resolveAsFiles());
+		archive.addAsLibraries(resolver.artifact("com.j256.simplemagic:simplemagic:1.2").resolveAsFiles());
 		
 		// add resources
 		archive.addAsResource("properties/priority1.properties")
 			   .addAsResource("properties/priority2.properties")
-			   .addAsResource("properties/priority3.properties");
+			   .addAsResource("properties/priority3.properties")
+			   .addAsResource("xml/priority4.xml")
+			   .addAsResource("xml/priority5.xml")
+		;
 		
 		// return archive
 		return archive;		

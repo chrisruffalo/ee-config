@@ -1,6 +1,9 @@
 package io.github.chrisruffalo.ee6config.resources.configuration;
 
 import io.github.chrisruffalo.ee6config.annotations.Configuration;
+import io.github.chrisruffalo.ee6config.mime.MimeGuesser;
+import io.github.chrisruffalo.ee6config.mime.SupportedType;
+import io.github.chrisruffalo.ee6config.resources.configuration.source.IConfigurationSource;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,45 +41,73 @@ public class PropertiesConfigurationProducer extends AbstractConfigurationProduc
 	@Produces
 	@Configuration(paths={})
 	public Properties getProperties(InjectionPoint injectionPoint) {
+		// properties should be stored here
 		Properties properties = new Properties();
 		
 		// locate configurations
 		Configuration configuration = this.getAnnotation(injectionPoint);
-		List<InputStream> found = this.locate(configuration);
+		List<IConfigurationSource> found = this.locate(configuration);
 		
-		// different behaviors for merge and unmerged properties
-		if(!configuration.merge()) {
-			// get top result
-			InputStream first = found.get(0);
+		// input stream list is immutable, copy so we can reverse
+		// if it needs merge
+		List<IConfigurationSource> copy = new ArrayList<IConfigurationSource>(found);
+		
+		// when merged the lowest priority should go first
+		// since the list comes in the order where the
+		// most important properties are found first
+		// it needs to be reversed
+		if(configuration.merge()) {
+			Collections.reverse(copy);
+		}
+		
+		// show how many streams were located
+		this.logger.trace("Found {} streams to load properties from", copy.size());
+		
+		// load each properties item individually
+		for(IConfigurationSource source : copy) {
+			// get type for stream
+			SupportedType type = MimeGuesser.guess(source);
+			
+			// if stream is not available, continue
+			if(!source.available()) {
+				continue;
+			}
+			
+			// get stream
+			InputStream stream = source.stream();
+			
+			// load properties
+			Properties local = new Properties();
 			try {
-				// and load properties from it
-				properties.load(first);
+				
+				// support XML as a type
+				if(SupportedType.XML.equals(type)) {
+					local.loadFromXML(stream);
+				} else {
+					local.load(stream);
+				}
+				
+				// log
+				this.logger.trace("Loaded {} properties from stream type '{}'", local.size(), type.name());
+				
+				// and then merge into properties
+				properties.putAll(local);
 			} catch (IOException e) {
 				this.logger.error("An error occured while loading configuration properties: {}", e.getMessage());
 			}
-		} else {
-			// when merged the lowest priority should go first
-			// since the list comes in the order where the
-			// most important properties are found first
-			// it needs to be reversed
-			List<InputStream> reversed = new ArrayList<InputStream>(found);
-			Collections.reverse(reversed);
 			
-			// load each properties item individually
-			for(InputStream stream : reversed) {
-				Properties local = new Properties();
-				try {
-					local.load(stream);
-					// and then merge into properties
-					properties.putAll(local);
-				} catch (IOException e) {
-					this.logger.error("An error occured while loading configuration properties: {}", e.getMessage());
-				}
-			}			
-		}
-		
-		// close streams
-		this.close(found);
+			// close stream
+			try {
+				stream.close();
+			} catch (IOException e) {
+				this.logger.trace("Could not close old stream: {}", stream);
+			}		
+			
+			// if not merge, then we're done
+			if(!configuration.merge()) {
+				break;
+			}
+		}			
 		
 		// return properties
 		return properties;

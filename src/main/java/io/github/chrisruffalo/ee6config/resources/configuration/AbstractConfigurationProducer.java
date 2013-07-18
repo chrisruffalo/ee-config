@@ -1,16 +1,14 @@
 package io.github.chrisruffalo.ee6config.resources.configuration;
 
 import io.github.chrisruffalo.ee6config.annotations.Configuration;
+import io.github.chrisruffalo.ee6config.resources.configuration.source.FileConfigurationSource;
+import io.github.chrisruffalo.ee6config.resources.configuration.source.IConfigurationSource;
+import io.github.chrisruffalo.ee6config.resources.configuration.source.ResourceConfigurationSource;
+import io.github.chrisruffalo.ee6config.resources.configuration.source.UnfoundConfigurationSource;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -38,23 +36,6 @@ public abstract class AbstractConfigurationProducer {
 	private Logger logger;
 
 	/**
-	 * Mass close of given streams.  Does the best it
-	 * can to ensure all the given streams are closed
-	 * before continuing.
-	 * 
-	 * @param streams to close
-	 */
-	protected void close(Collection<InputStream> streams) {
-		for(InputStream stream : streams) {
-			try {
-				stream.close();
-			} catch (IOException e) {
-				this.logger.error("Could not close stream: {}", e.getMessage());
-			}
-		}
-	}
-	
-	/**
 	 * Utility to get {@link Configuration} annotation from the
 	 * injection point with minimal effort
 	 * 
@@ -76,7 +57,7 @@ public abstract class AbstractConfigurationProducer {
 	 * 
 	 * @return List of InputStreams representing the configuration found
 	 */
-	protected List<InputStream> locate(Configuration configuration) {
+	protected List<IConfigurationSource> locate(Configuration configuration) {
 		// safe but shouldn't really ever be able to get here
 		if(configuration == null) {
 			return emptyResponse();
@@ -85,9 +66,9 @@ public abstract class AbstractConfigurationProducer {
 		String[] paths = configuration.paths();
 		boolean resolve = configuration.resolveSystemProperties();
 		
-		List<InputStream> streams = this.locate(paths, resolve);
+		List<IConfigurationSource> sources = this.locate(paths, resolve);
 		
-		return streams;
+		return sources;
 	}
 	
 	/**
@@ -100,7 +81,7 @@ public abstract class AbstractConfigurationProducer {
 	 * 
 	 * @return List of InputStreams representing the configuration found
 	 */
-	private List<InputStream> locate(String[] inputPaths, boolean resolve) {
+	private List<IConfigurationSource> locate(String[] inputPaths, boolean resolve) {
 		// return an empty input stream and create a warning
 		if(inputPaths == null || inputPaths.length == 0) {
 			this.logger.warn("Empty or null configuration deatils passed to configuration location resolver.");
@@ -125,7 +106,7 @@ public abstract class AbstractConfigurationProducer {
 		// check paths for configuration file 
 		// and store into a list in case the
 		// merge option is set
-		List<InputStream> found = new ArrayList<InputStream>(inputPaths.length);
+		List<IConfigurationSource> found = new ArrayList<IConfigurationSource>(inputPaths.length);
 		for(String path : paths) {
 		
 			// an empty path is meaningless, as
@@ -136,20 +117,20 @@ public abstract class AbstractConfigurationProducer {
 			}
 			
 			// stream that is found
-			final InputStream stream;
+			final IConfigurationSource source;
 			
 			// resolve according to if it was found
 			// as a resource or as a normal path
 			if(path.startsWith(AbstractConfigurationProducer.RESOURCE)) {
-				stream = this.getConfigurationResourceAtPath(path);
+				source = this.getConfigurationResourceAtPath(path);
 			} else {
-				stream = this.getConfigurationAtPath(path);
+				source = this.getConfigurationAtPath(path);
 			}
 			
 			// if a stream is found then save it
 			// in the order it was found
-			if(stream != null) {
-				found.add(stream);
+			if(source != null) {
+				found.add(source);
 			}
 		}		
 		
@@ -223,26 +204,14 @@ public abstract class AbstractConfigurationProducer {
 	 * 
 	 * @return input stream for the given file 
 	 */
-	private InputStream getConfigurationAtPath(String path) {
+	private IConfigurationSource getConfigurationAtPath(String path) {
 		// create file pointer from given path
 		File file = new File(path);
-		
-		// no file found, return null
-		if(!file.exists() || !file.isFile()) {
-			this.logger.debug("No file found at '{}'", file.getAbsolutePath());
-			return null;
+		FileConfigurationSource source = new FileConfigurationSource(file);
+		if(!source.available()) {
+			return new UnfoundConfigurationSource(path);
 		}
-		
-		InputStream foundFileInputStream;
-		try {
-			foundFileInputStream = new FileInputStream(file);
-			this.logger.debug("Found file at '{}'", file.getAbsolutePath());
-		} catch (FileNotFoundException e) {
-			this.logger.error("File found with java.io.File but exception thrown: {}", e.getMessage());
-			return null;
-		}
-		
-		return foundFileInputStream;
+		return source;
 	}
 	
 	/**
@@ -252,22 +221,19 @@ public abstract class AbstractConfigurationProducer {
 	 * 
 	 * @return the InputStream for the resource if it was found
 	 */
-	private InputStream getConfigurationResourceAtPath(String resourcePath) {
+	private IConfigurationSource getConfigurationResourceAtPath(String resourcePath) {
 		
 		// create path to resource by removing prepended "resource:" if it exists as a prefix
 		String resource = StringUtils.removeStart(resourcePath, AbstractConfigurationProducer.RESOURCE);
 		
-		// get resoruce from context
-		InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
+		// get resource
+		ResourceConfigurationSource source = new ResourceConfigurationSource(resource);
 		
-		// debug logging
-		if(stream == null) {
-			this.logger.trace("No resource found at path '{}' for resource", resource);
-		} else {
-			this.logger.trace("Found resource at path '{}' for resource", resource);
+		if(!source.available()) {
+			return new UnfoundConfigurationSource(resource);
 		}
 		
-		return stream;
+		return source;
 	}
 
 	/**
@@ -277,10 +243,9 @@ public abstract class AbstractConfigurationProducer {
 	 * @return a list with one element that contains
 	 * 		   an empty input stream
 	 */
-	private List<InputStream> emptyResponse() {
-		List<InputStream> emptyReturn = new ArrayList<InputStream>(1);
-		InputStream emptyResult = new ByteArrayInputStream(new byte[0]);
-		emptyReturn.add(emptyResult);
+	private List<IConfigurationSource> emptyResponse() {
+		List<IConfigurationSource> emptyReturn = new ArrayList<IConfigurationSource>(1);
+		emptyReturn.add(new UnfoundConfigurationSource());
 		return emptyReturn;
 	}
 }
