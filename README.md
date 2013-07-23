@@ -41,7 +41,7 @@ Adding this dependency to your project should be as simple as:
 ```xml
 <dependency>
 	<groupId>com.github.chrisruffalo</groupId>
-	<artifactId>ee6-config</artifactId>
+	<artifactId>ee-config</artifactId>
 	<version>1.0-SNAPSHOT</version>	
 </dependency>
 ```
