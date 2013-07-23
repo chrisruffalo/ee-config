@@ -1,4 +1,4 @@
-EE6-Config - Application, Configure Thyself
+EE-Config - Application, Configure Thyself
 ==========
 
 ## Introduction and Justification
