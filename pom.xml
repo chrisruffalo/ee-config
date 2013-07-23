@@ -245,6 +245,13 @@
 					</configuration>
 				</plugin>
 				
+				<!-- use modern maven release plugin -->
+		        <plugin>
+		            <groupId>org.apache.maven.plugins</groupId>
+		            <artifactId>maven-release-plugin</artifactId>
+		            <version>2.2.2</version>
+            	</plugin>
+				
 				<!-- sync with eclipse (download code, etc) -->
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
