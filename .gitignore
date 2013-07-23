@@ -10,3 +10,6 @@
 .classpath
 .settings
 .project
+
+# mvn cruft #
+release.properties

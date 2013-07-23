@@ -36,7 +36,7 @@ public final class DeploymentFactory {
 		resolver.goOffline();
 		
 		// commons-configuration and dependencies
-		archive.addAsLibraries(resolver.artifact("commons-configuration:commons-configuration:1.6").resolveAsFiles());
+		archive.addAsLibraries(resolver.artifact("commons-configuration:commons-configuration:1.9").resolveAsFiles());
 		archive.addAsLibraries(resolver.artifact("com.j256.simplemagic:simplemagic:1.2").resolveAsFiles());
 		
 		// add resources

@@ -2,11 +2,19 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.chrisruffalo</groupId>
-	<artifactId>ee6-config</artifactId>
+	<artifactId>ee-config</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>ee6-config</name>
 	<description>annotations and helpers for easier configuration of ee6 applications</description>
+	<url>https://github.com/chrisruffalo/ee-config</url>
+
+	<!-- use sonatype parent for releases -->
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
+	</parent>
 
 	<properties>
 		<!-- source output version -->
@@ -31,31 +39,29 @@
 		<local.build.timestamp>${maven.build.timestamp}</local.build.timestamp>
 	</properties>
 	
-	<!-- scm information for buildnumber plugin -->
+	<!-- developers -->
+	<developers>
+		<developer>
+			<name>Chris Ruffalo</name>
+			<id>cruffalo</id>
+		</developer>
+	</developers>
+	
+	<!-- scm information for buildnumber plugin and maven releases -->
 	<scm>
-		<connection>scm:git:https://github.com/chrisruffalo/ee6-config.git</connection>
+	    <connection>scm:git:git@github.com:chrisruffalo/ee-config.git</connection>
+		<developerConnection>scm:git:git@github.com:chrisruffalo/ee-config.git</developerConnection>
+		<url>git@github.com:chrisruffalo/ee-config.git</url>
 	</scm>
 
-	<!-- supplementary repositories -->
-	<repositories>
-		<!-- jboss dependencies -->
-		<repository>
-			<id>jboss</id>
-			<url>https://repository.jboss.org/nexus/content/repositories/releases</url>
-		</repository>
-		<repository>
-			<id>jboss-snapshots</id>
-			<url>https://repository.jboss.org/nexus/content/repositories/snapshots</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>thirdparty-releases</id>
-			<name>JBoss Thirdparty Releases</name>
-			<url>https://repository.jboss.org/nexus/content/repositories/thirdparty-releases</url>
-		</repository>
-	</repositories>
+	<!-- licensing information -->
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
 
 	<!-- manage dependency groups -->
 	<dependencyManagement>
@@ -98,6 +104,12 @@
 			<groupId>org.jboss.spec</groupId>
 			<artifactId>jboss-javaee-6.0</artifactId>
 			<type>pom</type>
+			<exclusions>
+				<exclusion>
+					<artifactId>xalan</artifactId>
+					<groupId>xalan</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- logging -->
@@ -281,6 +293,7 @@
 	</build>
 
 	<profiles>
+		<!-- profile for arquillian test cases managed with this profile -->
 		<profile>
 			<id>arquillian-jboss-managed</id>
 			<activation>
@@ -332,5 +345,34 @@
 				</plugins>
 			</build>
 		</profile>
+
+		<!-- profile for signing release artifacts -->
+		<profile>
+			<id>release-sign-artifacts</id>
+			<activation>
+				<property>
+					<name>release</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.1</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>		
 	</profiles>
 </project>
