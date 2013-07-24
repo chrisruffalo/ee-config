@@ -45,7 +45,7 @@ Adding this dependency to your project should be as simple as:
 </dependency>
 ```
 
-Of course, this depends on you building and installing it yourself into your Maven repo.  It cannot be found in Maven central or another repository just yet.
+The project 'ee-config' has been in maven central since version 1.0.
 
 ### Logging
 
