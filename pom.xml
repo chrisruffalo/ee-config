@@ -1,9 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.chrisruffalo</groupId>
 	<artifactId>ee-config</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0</version>
 	<packaging>jar</packaging>
 	<name>ee-config</name>
 	<description>annotations and helpers for easier configuration of ee applications</description>
@@ -52,7 +51,8 @@
 		<connection>scm:git:git@github.com:chrisruffalo/ee-config.git</connection>
 		<url>scm:git:git@github.com:chrisruffalo/ee-config.git</url>
 		<developerConnection>scm:git:git@github.com:chrisruffalo/ee-config.git</developerConnection>
-  	</scm>
+  	  <tag>ee-config-1.0</tag>
+  </scm>
 
 	<!-- licensing information -->
 	<licenses>
@@ -288,7 +288,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore></ignore>
+										<ignore />
 									</action>
 								</pluginExecution>
 							</pluginExecutions>
