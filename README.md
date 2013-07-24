@@ -40,9 +40,9 @@ Adding this dependency to your project should be as simple as:
 
 ```xml
 <dependency>
-	<groupId>com.github.chrisruffalo</groupId>
-	<artifactId>ee-config</artifactId>
-	<version>1.0-SNAPSHOT</version>	
+  <groupId>com.github.chrisruffalo</groupId>
+  <artifactId>ee-config</artifactId>
+  <version>1.0</version>
 </dependency>
 ```
 
