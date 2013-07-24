@@ -15,16 +15,15 @@ When version 2.0 of the application came along we were very excited to move to E
 
 ## Requirements
 
-Sadly, I don't want to code everything from scratch, so the EE6-Config library requires a few things to get started.  First it requires EE6.  It is developed using the JBoss flavor provided by the Maven dependency but there is no reason it shouldn't work on other EE6 implementations.
+Sadly, I don't want to code everything from scratch, so the EE-Config library requires a few things to get started.  First it requires at least EE6.  It is developed using the JBoss flavor provided by the Maven dependency but there is no reason it shouldn't work on other EE implementations.
 
 It also requires 
 
 * SLF4J 1.6.1
 * Apache Commons Configuration 1.9
 * Apache Commons Utilities 1.9
-* SimpleMagic 1.2
 
-These utilities provide logging, configuration, and other shared parts that would be difficult to do without.  SimpleMagic provides magical support for file types which is used to guess how to load configuration files.
+These utilities provide logging, configuration, and other shared parts that would be difficult to do without.
 
 Commons Configuration also provides one of the injectable configuration types to allow you to **directly inject Commons Configuration** right into your application!
 
