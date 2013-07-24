@@ -42,7 +42,7 @@ Adding this dependency to your project should be as simple as:
 <dependency>
   <groupId>com.github.chrisruffalo</groupId>
   <artifactId>ee-config</artifactId>
-  <version>1.0</version>
+  <version>1.1</version>
 </dependency>
 ```
 
@@ -113,7 +113,7 @@ No other types are implemented yet.
 
 ### Examples
 
-It might be nice if we just shut up and showed you how to use it.  Below you'll see some examples that use the @Configuration annotation.  The annotation is from the package 'io.github.chrisruffalo.ee6config.annotations'.
+It might be nice if we just shut up and showed you how to use it.  Below you'll see some examples that use the @Configuration annotation.  The annotation is from the package 'com.github.chrisruffalo.eeconfig.annotations'.
 
 #### Example Java Properties
 

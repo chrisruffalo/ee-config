@@ -8,10 +8,7 @@ import java.net.URLConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.chrisruffalo.eeconfig.resources.configuration.source.FileConfigurationSource;
 import com.github.chrisruffalo.eeconfig.resources.configuration.source.IConfigurationSource;
-import com.j256.simplemagic.ContentInfo;
-import com.j256.simplemagic.ContentInfoUtil;
 
 /**
  * Simple helper for guessing a condensed MIME type.
@@ -60,48 +57,19 @@ public class MimeGuesser {
 
 		try {
 			// string for mime type
-			String typeString = "";
-			
-			// create content type checker
-			ContentInfoUtil util = new ContentInfoUtil();
-			
-			// mark stream for later reset
-			if(stream.markSupported()) {
-				stream.mark(Integer.MAX_VALUE);
-			}
-			
-			// find match direct from stream
-			ContentInfo info = util.findMatch(stream);
-			
-			// if no info found from file, look up by file
-			if(info == null && source instanceof FileConfigurationSource) {
-				FileConfigurationSource fileSource = (FileConfigurationSource)source;
-				info = util.findMatch(fileSource.getFile());
-			}
-			
-			// check again using built-in java stream checking
-			if(info == null) {
-				stream.reset();
-				URLConnection.guessContentTypeFromStream(stream);
-			}
+			String typeString = URLConnection.guessContentTypeFromStream(stream);;
 			
 			// check again using java url
-			if(info == null) {
-				URLConnection.guessContentTypeFromName(source.getPath());
+			if(typeString == null || typeString.isEmpty()) {
+				typeString = URLConnection.guessContentTypeFromName(source.getPath());
 			}
 			
-			// if info is *still* null, look up by name
-			if(info == null) {
-				info = ContentInfoUtil.findExtensionMatch(source.getExtension());
-			}
-			
-			// just brute force the string
-			if(info == null) {
+			// just brute force according to the string
+			if(typeString == null || typeString.isEmpty()) {
 				typeString = source.getExtension().toLowerCase();
-			} else {
-				typeString = info.toString().toLowerCase();
 			}
  
+			// log mime info
 			logger.trace("Mime type: " + typeString);
 						
 			// check if the type is xml
@@ -119,6 +87,7 @@ public class MimeGuesser {
 			// if an error happens, type should be text
 			logger.error("Could not get MIME due to exception: {}", ex.getMessage());
 			type = SupportedType.TEXT;
+			ex.printStackTrace();
 		} finally {
 			// the stream is no longer needed so close it
 			try {

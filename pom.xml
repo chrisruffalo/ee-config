@@ -26,7 +26,6 @@
 		<slf4j.version>1.6.1</slf4j.version> <!-- from JBoss Logging 3.1.X.GA and Hibernate Validator -->
 		<guava.version>11.0.2</guava.version> <!-- bundled with jboss as 7.1 and eap 6.0x -->
 		<commons.configuration.version>1.9</commons.configuration.version>
-		<simple.magic.version>1.2</simple.magic.version>
 
 		<!-- arquillian testing -->
 		<arquillian.version>1.0.3.Final</arquillian.version>
@@ -127,13 +126,6 @@
 			<scope>test</scope>
 		</dependency>
 		
-		<!-- magical mime types -->
-		<dependency>
-		    <groupId>com.j256.simplemagic</groupId>
-		    <artifactId>simplemagic</artifactId>
-		    <version>1.2</version>
-		</dependency>
-
 		<!-- configuration -->
 		<dependency>
 			<groupId>commons-configuration</groupId>

@@ -5,7 +5,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
@@ -20,7 +22,7 @@ import com.github.chrisruffalo.eeconfig.resources.configuration.source.ResourceC
 import com.github.chrisruffalo.eeconfig.resources.configuration.source.UnfoundConfigurationSource;
 
 /**
- * Core shared logic for loading configuration files
+ * Implements shared logic for loading configuration files
  * 
  * @author Chris Ruffalo <cruffalo@redhat.com>
  *
@@ -97,7 +99,7 @@ public abstract class AbstractConfigurationProducer {
 			// resolved property is found then it is
 			// used
 			for(String path : inputPaths) {
-				String resolved = this.resolveProperty(path);
+				String resolved = this.resolveProperties(path);
 				paths.add(resolved);
 			}
 		} else {
@@ -145,13 +147,26 @@ public abstract class AbstractConfigurationProducer {
 	}
 	
 	/**
-	 * Resolve system properties within the given string
+	 * Resolve system properties within the provided string
 	 * 
-	 * @param fullString including ${} tokens
+	 * @param fullString including ${} enclosed tokens
 	 * 
 	 * @return string with tokens resolved where they exist and have values
 	 */
-	private String resolveProperty(String fullString) {
+
+	private String resolveProperties(String fullString) {
+		return resolveProperties(fullString, new HashMap<String, String>(0));
+	}
+	
+	/**
+	 * Resolve system properties and given properties within the provided string
+	 * 
+	 * @param fullString including ${} enclosed tokens
+	 * @param additionalProperties map of additional properties to use
+	 * 
+	 * @return string with tokens resolved where they exist and have values
+	 */
+	private String resolveProperties(String fullString, Map<String, String> additionalProperties) {
 		// find tokens
 		String[] foundTokens = StringUtils.substringsBetween(fullString, "${", "}");
 		
@@ -171,7 +186,12 @@ public abstract class AbstractConfigurationProducer {
 			}
 			
 			// get the property
-			String property = System.getProperty(token);
+			final String property;
+			if(additionalProperties != null && additionalProperties.containsKey(token)) {
+				property = additionalProperties.get(token);
+			} else {
+				property = System.getProperty(token);
+			}
 						
 			// if the property is null, leave
 			if(property == null) {
@@ -192,6 +212,9 @@ public abstract class AbstractConfigurationProducer {
 		
 		// log
 		this.logger.trace("Resolved '{}' to '{}'", fullString, output);
+		
+		// recurse to re-resolve any properties
+		output = this.resolveProperties(output, additionalProperties);
 		
 		// return resolved output
 		return output;

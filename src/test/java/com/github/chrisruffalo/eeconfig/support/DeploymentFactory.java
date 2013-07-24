@@ -52,11 +52,9 @@ public final class DeploymentFactory {
 		
 		// load versions from properties file
 		String commonsConfigurationVersion = properties.getProperty("commons.configuration.version", "1.9");
-		String simpleMagicVersion = properties.getProperty("simple.magic.version", "1.2");
 		
 		// commons-configuration and dependencies
 		archive.addAsLibraries(resolver.artifact("commons-configuration:commons-configuration:" + commonsConfigurationVersion).resolveAsFiles());
-		archive.addAsLibraries(resolver.artifact("com.j256.simplemagic:simplemagic:" + simpleMagicVersion).resolveAsFiles());
 		
 		// add resources
 		archive.addAsResource("properties/priority1.properties")
