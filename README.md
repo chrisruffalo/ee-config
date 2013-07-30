@@ -261,11 +261,11 @@ There are two extendable behaviors in EE-Config.  Each of these is governed by a
 
 ### Configuration source and resource location
 
-The [ConfigurationSourceLocator](src/main/java/com/github/chrisruffalo/eeconfig/strategy/locator/ConfigurationSourceLocator.java) is the interface for creating custom locators for the configuration sources.  The [default implementation](src/main/java/com/github/chrisruffalo/eeconfig/strategy/locator/ConfigurationSourceLocator.java) is normally used for finding files and resources.
+The [ConfigurationSourceLocator](src/main/java/com/github/chrisruffalo/eeconfig/strategy/locator/ConfigurationSourceLocator.java) is the interface for creating custom locators for the configuration sources.  The [default implementation](src/main/java/com/github/chrisruffalo/eeconfig/strategy/locator/DefaultConfigurationSourceLocator.java) is normally used for finding files and resources.
 
 ### Property token resolution
 
-A similar approach is taken with the [PropertyResolver](src/main/java/com/github/chrisruffalo/eeconfig/strategy/property/PropertyResolver.java).  There is also a [default implementation](src/main/java/com/github/chrisruffalo/eeconfig/strategy/property/PropertyResolver.java) that normally handles the resolution of properties within the resource paths.  This could be overriden to provide different token types or possibly even a pre-seeded property set.
+A similar approach is taken with the [PropertyResolver](src/main/java/com/github/chrisruffalo/eeconfig/strategy/property/PropertyResolver.java).  There is also a [default implementation](src/main/java/com/github/chrisruffalo/eeconfig/strategy/property/DefaultPropertyResolver.java) that normally handles the resolution of properties within the resource paths.  This could be overriden to provide different token types or possibly even a pre-seeded property set.
 
 ### Putting it to work
 
