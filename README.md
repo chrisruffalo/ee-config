@@ -246,7 +246,7 @@ public class MyCustomConfigurationProducer extends AbstractConfigurationProducer
 	}
 ```
 
-Using this method you'll be able to implement whatever crazy scheme you can come up with to create your applications configuration.
+Using this method you'll be able to implement whatever crazy scheme you can come up with to create your application's configuration.
 
 ## Other
 
