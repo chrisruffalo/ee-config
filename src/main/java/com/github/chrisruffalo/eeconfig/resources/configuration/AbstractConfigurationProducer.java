@@ -4,25 +4,20 @@ package com.github.chrisruffalo.eeconfig.resources.configuration;
 import java.util.List;
 
 import javax.enterprise.inject.spi.InjectionPoint;
-import javax.inject.Inject;
-
-import org.slf4j.Logger;
 
 import com.github.chrisruffalo.eeconfig.annotations.Configuration;
 import com.github.chrisruffalo.eeconfig.resources.configuration.source.IConfigurationSource;
 import com.github.chrisruffalo.eeconfig.strategy.locator.ConfigurationSourceLocator;
 import com.github.chrisruffalo.eeconfig.strategy.locator.DefaultConfigurationSourceLocator;
+import com.github.chrisruffalo.eeconfig.strategy.property.PropertyResolver;
 
 /**
  * Implements shared logic for loading configuration files
  * 
- * @author Chris Ruffalo <cruffalo@redhat.com>
+ * @author Chris Ruffalo
  *
  */
 public abstract class AbstractConfigurationProducer {
-
-	@Inject
-	private Logger logger;
 	
 	/**
 	 * Utility to get {@link Configuration} annotation from the
@@ -48,6 +43,10 @@ public abstract class AbstractConfigurationProducer {
 	 */
 	protected List<IConfigurationSource> locate(Configuration configuration) {
 		
+		if(configuration == null) {
+			throw new IllegalArgumentException("A non-null Configuration annotation must be provided");
+		}
+		
 		ConfigurationSourceLocator locator = null;
 		Class<ConfigurationSourceLocator> sourceLocatorClass = configuration.locator();
 		if(sourceLocatorClass != null) {
@@ -63,6 +62,23 @@ public abstract class AbstractConfigurationProducer {
 		// if no locator is available, use the default
 		if(locator == null) {
 			locator = new DefaultConfigurationSourceLocator();
+		}
+		
+		PropertyResolver resolver = null;
+		Class<PropertyResolver> propertyResolverClass = configuration.propertyResolver();
+		if(propertyResolverClass != null) {
+			try {
+				resolver = propertyResolverClass.newInstance();
+			} catch (InstantiationException e) {
+				// no operation, fall through to default
+			} catch (IllegalAccessException e) {
+				// no operation, fall through to default
+			}
+		}
+		
+		// if a resolver was created, set it on the locator
+		if(resolver != null) {
+			locator.setPropertyResolver(resolver);
 		}
 		
 		// locate through the location source

@@ -1,7 +1,9 @@
 package com.github.chrisruffalo.eeconfig.strategy.property;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -28,54 +30,77 @@ public class DefaultPropertyResolver implements PropertyResolver {
 	 */
 	@Override
 	public String resolveProperties(String fullString, Map<String, String> additionalProperties) {
-		// find tokens
-		String[] foundTokens = StringUtils.substringsBetween(fullString, "${", "}");
-
-		// if no tokens are found, leave
-		if(foundTokens == null || foundTokens.length == 0) {
-			return fullString;
-		}
-
-		// output string manipulation
+		
+		// prevent loops
+		Set<String> previousValues = new HashSet<String>();
+		
+		// string for manipulation
 		String output = fullString;
-
-		// for each token, resolve
-		for(String token : foundTokens) {
-			// if the token is null, leave
-			if(token == null) {
-				continue;
+		
+		// initial value is a 'previous value'
+		previousValues.add(output);
+		
+		// loop until the resolved string is 'stable'.  in previous
+		// versions this was a recursive step but recursion was
+		// dropped for two reasons.  the first is that it complicates
+		// the 'previous value' resolution that stops cyclic
+		// and recursive resolution.  the second is becuase Java
+		// doesn't really gain anything from a recursive loop.
+		while(true) {
+			// find tokens
+			String[] foundTokens = StringUtils.substringsBetween(output, "${", "}");
+	
+			// if no tokens are found, leave
+			if(foundTokens == null || foundTokens.length == 0) {
+				break;
 			}
-
-			// get the property
-			final String property;
-			if(additionalProperties != null && additionalProperties.containsKey(token)) {
-				property = additionalProperties.get(token);
-			} else {
-				property = System.getProperty(token);
+	
+			// for each token, resolve
+			for(String token : foundTokens) {
+				// if the token is null, leave
+				if(token == null) {
+					continue;
+				}
+	
+				// get the property
+				final String property;
+				if(additionalProperties != null && additionalProperties.containsKey(token)) {
+					property = additionalProperties.get(token);
+				} else {
+					property = System.getProperty(token);
+				}
+	
+				// if the property is null, leave
+				if(property == null) {
+					continue;
+				}
+	
+				// if the property is the same as the token
+				// then leave
+				if(token.equals(property)) {
+					continue;
+				}
+	
+				// now we have a non-null property that
+				// is different than the initial token
+				// so now we have something to replace with
+				output = StringUtils.replace(output, "${" + token + "}", property);
 			}
-
-			// if the property is null, leave
-			if(property == null) {
-				continue;
+	
+			// log
+			this.logger.trace("Resolved '{}' to '{}'", fullString, output);
+			
+			// if the previous values list contains an earlier version of the string
+			// we can consider it safe to return because it's either recursive or
+			// cyclic
+			if(previousValues.contains(output)) {
+				this.logger.warn("Cyclic or recursive property resolution found for '{}', done resolving properties", output);
+				break;
 			}
-
-			// if the property is the same as the token
-			// then leave
-			if(token.equals(property)) {
-				continue;
-			}
-
-			// now we have a non-null property that
-			// is different than the initial token
-			// so now we have something to replace with
-			output = StringUtils.replace(output, "${" + token + "}", property);
+			
+			// store this step's value as a 'previous value'
+			previousValues.add(output);
 		}
-
-		// log
-		this.logger.trace("Resolved '{}' to '{}'", fullString, output);
-
-		// recurse to re-resolve any properties
-		output = this.resolveProperties(output, additionalProperties);
 
 		// return resolved output
 		return output;
