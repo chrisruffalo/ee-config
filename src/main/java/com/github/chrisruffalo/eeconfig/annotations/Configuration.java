@@ -10,6 +10,9 @@ import java.lang.annotation.Target;
 import javax.enterprise.util.Nonbinding;
 import javax.inject.Qualifier;
 
+import com.github.chrisruffalo.eeconfig.strategy.locator.ConfigurationSourceLocator;
+import com.github.chrisruffalo.eeconfig.strategy.property.PropertyResolver;
+
 /**
  * Annotation for specifying configuration file that
  * should be loaded.
@@ -76,4 +79,23 @@ public @interface Configuration {
 	 */
 	@Nonbinding
 	boolean merge() default false;
+	
+	/**
+	 * Implementation to use for locating files.  Uses the {@link ConfigurationSourceLocator} 
+	 * interface and provides the basic tools for looking up the resources/configuration 
+	 * files that can be used by the provider. 
+	 * 
+	 * @return the class that implements the configuration source locator behavior
+	 */
+	Class<ConfigurationSourceLocator> locator() default ConfigurationSourceLocator.class;
+	
+	/**
+	 * The implementing class for the property resolver.  Allows the annotation
+	 * to configure how the token properties found in the resource/file paths will
+	 * be resolved.  
+	 * 
+	 * @return the class that implements the property resolver behavior
+	 */
+	Class<PropertyResolver> propertyResolver() default PropertyResolver.class;
+	
 }
