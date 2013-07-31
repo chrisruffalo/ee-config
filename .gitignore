@@ -14,3 +14,6 @@
 # mvn cruft #
 release.properties
 bin
+
+# readme edit
+README.md~

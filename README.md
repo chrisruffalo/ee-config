@@ -5,7 +5,7 @@ EE-Config - Application, Configure Thyself
 
 So often, during the course of my work, I find that various projects have chosen, for whatever reason, to create configurations that are difficult to maintain per-environment.  A lot of these require one of the following:
 
-* Configuration controlled by environment specific properties, each artifact built for a specific environment
+* Configuration controlled by build-specific properties, each artifact built for a specific environment
 * Properties embedded inside application war where the WAR must be cracked, exploded, or rebuilt for each environment
 * Application configuration contained in the web.xml or other project artifact
 
@@ -41,7 +41,7 @@ Adding this dependency to your project should be as simple as:
 <dependency>
   <groupId>com.github.chrisruffalo</groupId>
   <artifactId>ee-config</artifactId>
-  <version>1.1</version>
+  <version>1.2</version>
 </dependency>
 ```
 
@@ -69,7 +69,7 @@ The created logger is created using the class name of the injection target.
 
 ### System Properties
 
-One of the first things we thought to inject was system properties.  This means that you can inject either the usual Java properties (like 'java.io.tmpdir') or system properties set by your container (like 'jboss.server.config.dir').  
+One of the first things we thought to inject was system properties.  This means that you can inject either the usual Java properties (like 'java.io.tmpdir') or system properties set by your container (like 'jboss.server.config.dir').
 
 ``` java
 public class INeedSystemProperties {
@@ -99,7 +99,7 @@ Configuration is tricky, so we've tried to make it easier.  Injecting the config
 * A *null object is never injected*.  There may be an empty property file or an empty input stream that is injected but it will **never** be null.
 * In the non-merge case the **first** configuration file found is used for the injection.
 * In the merge case the *first* configuration file has the highest prority, other found configuration files will have lower priority.
-* When injecting an InputStream the merge flag has no effect.
+* When injecting an InputStream or InputStreams the merge flag has no effect.
 
 Keeping in mind those things it is important to realize, too, that the configuration injection will inject the following types:
 
@@ -108,7 +108,12 @@ Keeping in mind those things it is important to realize, too, that the configura
 * java.io.InputStream
 * java.util.List<java.io.InputStream>
 
-No other types are implemented yet.
+The Commons Configuraiton supports the following subtypes:
+
+* PropertiesConfiguration
+* XMLConfiguraiton
+
+No other types or subtypes are implemented yet.  *(To request other types, jump over to the issues page!)*
 
 ### Examples
 
@@ -246,9 +251,52 @@ public class MyCustomConfigurationProducer extends AbstractConfigurationProducer
 	}
 ```
 
-Using this method you'll be able to implement whatever crazy scheme you can come up with to create your applications configuration.
+Using this method you'll be able to implement whatever crazy scheme you can come up with to create your application's configuration.
 
-## Other
+## Extending EE-Configuration default behavior
+
+There are two extendable behaviors in EE-Config.  Each of these is governed by a strategy.  These strategies can be overriden to produce different behaviors for finding resources and files.
+
+**Each of these strategies *must* have a public no-arg constructor.**  If they do not then they will not be usable and the default implementation of each will be used instead.
+
+### Configuration source and resource location
+
+The [ConfigurationSourceLocator](src/main/java/com/github/chrisruffalo/eeconfig/strategy/locator/ConfigurationSourceLocator.java) is the interface for creating custom locators for the configuration sources.  The [default implementation](src/main/java/com/github/chrisruffalo/eeconfig/strategy/locator/DefaultConfigurationSourceLocator.java) is normally used for finding files and resources.
+
+### Property token resolution
+
+A similar approach is taken with the [PropertyResolver](src/main/java/com/github/chrisruffalo/eeconfig/strategy/property/PropertyResolver.java).  There is also a [default implementation](src/main/java/com/github/chrisruffalo/eeconfig/strategy/property/DefaultPropertyResolver.java) that normally handles the resolution of properties within the resource paths.  This could be overriden to provide different token types or possibly even a pre-seeded property set.
+
+### Putting it to work
+
+Let's say you *do* want some form of custom resolution.
+
+``` java
+public class ConfigureMeWithCustomBehavior {
+	@Inject
+	@Configuration(
+		paths = {
+			"@@jboss.server.config.dir@@/application/main.properties" // main configuration
+		},
+		resolveSystemProperties = true, // resolves system properties in paths
+		locator = com.example.CustomLocator.class, // custom locator class
+		propertyResolver = com.example.CustomResolver.class // custom property resolver
+	)
+	private Properties properties; 
+	
+	@PostConstruct
+	private void init() {
+		
+	}
+}
+```
+This example shows the possibility of using a custom resolver to resolve a different token type (@@jboss.server.config.dir@@) and a custom locator that could possibly resolve files a little differently.  Overriding the default behavior is that simple.
+
+## Issues
+
+Please feel to open issues if you have problems with EE-Config.
+
+## License
 
 This application is released under the Apache License v2.
 
