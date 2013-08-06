@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
@@ -21,6 +22,7 @@ import com.github.chrisruffalo.eeconfig.mime.MimeGuesser;
 import com.github.chrisruffalo.eeconfig.mime.SupportedType;
 import com.github.chrisruffalo.eeconfig.resources.configuration.source.IConfigurationSource;
 
+@ApplicationScoped
 public class CommonsConfigurationProducer extends AbstractConfigurationProducer {
 
 	@Inject

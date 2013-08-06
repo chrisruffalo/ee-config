@@ -5,10 +5,15 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.enterprise.inject.Default;
+import javax.inject.Singleton;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Default
+@Singleton
 public class DefaultPropertyResolver implements PropertyResolver {
 
 	private Logger logger;

@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
@@ -26,6 +27,7 @@ import com.github.chrisruffalo.eeconfig.resources.configuration.source.IConfigur
  * @author Chris Ruffalo
  *
  */
+@ApplicationScoped
 public class PropertiesConfigurationProducer extends AbstractConfigurationProducer {
 	
 	@Inject

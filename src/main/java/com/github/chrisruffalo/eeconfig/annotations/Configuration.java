@@ -11,6 +11,8 @@ import javax.enterprise.util.Nonbinding;
 import javax.inject.Qualifier;
 
 import com.github.chrisruffalo.eeconfig.strategy.locator.ConfigurationSourceLocator;
+import com.github.chrisruffalo.eeconfig.strategy.locator.DefaultConfigurationSourceLocator;
+import com.github.chrisruffalo.eeconfig.strategy.property.DefaultPropertyResolver;
 import com.github.chrisruffalo.eeconfig.strategy.property.PropertyResolver;
 
 /**
@@ -87,7 +89,8 @@ public @interface Configuration {
 	 * 
 	 * @return the class that implements the configuration source locator behavior
 	 */
-	Class<ConfigurationSourceLocator> locator() default ConfigurationSourceLocator.class;
+	@Nonbinding
+	Class<? extends ConfigurationSourceLocator> locator() default DefaultConfigurationSourceLocator.class;
 	
 	/**
 	 * The implementing class for the property resolver.  Allows the annotation
@@ -96,6 +99,7 @@ public @interface Configuration {
 	 * 
 	 * @return the class that implements the property resolver behavior
 	 */
-	Class<PropertyResolver> propertyResolver() default PropertyResolver.class;
+	@Nonbinding
+	Class<? extends PropertyResolver> propertyResolver() default DefaultPropertyResolver.class;
 	
 }

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
@@ -23,6 +24,7 @@ import com.github.chrisruffalo.eeconfig.resources.configuration.source.IConfigur
  * @author Chris Ruffalo
  *
  */
+@ApplicationScoped
 public class InputStreamConfigurationProducer extends AbstractConfigurationProducer {
 
 	@Inject

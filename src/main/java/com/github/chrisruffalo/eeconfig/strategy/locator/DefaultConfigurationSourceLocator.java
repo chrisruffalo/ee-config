@@ -6,6 +6,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.enterprise.inject.Default;
+import javax.inject.Singleton;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +27,8 @@ import com.github.chrisruffalo.eeconfig.strategy.property.PropertyResolver;
  * @author Chris Ruffalo
  *
  */
+@Singleton
+@Default
 public class DefaultConfigurationSourceLocator implements ConfigurationSourceLocator {
 	
 	/**
