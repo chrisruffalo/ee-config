@@ -17,6 +17,7 @@ import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.configuration.tree.OverrideCombiner;
 import org.slf4j.Logger;
 
+import com.github.chrisruffalo.eeconfig.annotations.AutoLogger;
 import com.github.chrisruffalo.eeconfig.annotations.Configuration;
 import com.github.chrisruffalo.eeconfig.mime.MimeGuesser;
 import com.github.chrisruffalo.eeconfig.mime.SupportedType;
@@ -26,6 +27,7 @@ import com.github.chrisruffalo.eeconfig.resources.configuration.source.IConfigur
 public class CommonsConfigurationProducer extends AbstractConfigurationProducer {
 
 	@Inject
+	@AutoLogger
 	private Logger logger;
 	
 	@Produces

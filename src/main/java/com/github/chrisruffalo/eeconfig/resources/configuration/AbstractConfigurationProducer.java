@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionPoint;
@@ -14,6 +13,7 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
+import com.github.chrisruffalo.eeconfig.annotations.AutoLogger;
 import com.github.chrisruffalo.eeconfig.annotations.Configuration;
 import com.github.chrisruffalo.eeconfig.resources.configuration.source.IConfigurationSource;
 import com.github.chrisruffalo.eeconfig.strategy.locator.ConfigurationSourceLocator;
@@ -30,16 +30,11 @@ import com.github.chrisruffalo.eeconfig.strategy.property.PropertyResolver;
 public abstract class AbstractConfigurationProducer {
 	
 	@Inject
+	@AutoLogger
 	private Logger logger;
 	
 	@Inject
 	private BeanManager manager;
-	
-	@Inject
-	private Instance<ConfigurationSourceLocator> locatorInstance;
-	
-	@Inject
-	private Instance<PropertyResolver> resolverInstance;
 	
 	/**
 	 * Utility to get {@link Configuration} annotation from the

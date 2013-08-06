@@ -27,6 +27,7 @@ import com.google.common.io.ByteStreams;
 public class CommonsConfigurationProducerTest {
 
 	//@Inject
+	//@AutoLogger
 	//private Logger logger;
 	
 	@Deployment

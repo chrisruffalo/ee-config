@@ -19,6 +19,7 @@ import com.github.chrisruffalo.eeconfig.support.DeploymentFactory;
 public class PropertiesConfigurationProducerTest {
 
 	//@Inject
+	//@AutoLogger
 	//private Logger logger;
 	
 	@Deployment

@@ -6,6 +6,8 @@ import javax.enterprise.inject.spi.InjectionPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.chrisruffalo.eeconfig.annotations.AutoLogger;
+
 /**
  * Simple producer that creates loggers to satisfy
  * injection points
@@ -23,6 +25,7 @@ public class LoggerProducer {
 	 * @return Logger for the Class
 	 */
 	@Produces
+	@AutoLogger
 	public Logger createLogger(InjectionPoint injectionPoint) {
 		return LoggerFactory.getLogger(injectionPoint.getMember().getDeclaringClass().getName());
 	}

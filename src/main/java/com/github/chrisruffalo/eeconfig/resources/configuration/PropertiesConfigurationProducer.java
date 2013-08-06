@@ -15,6 +15,7 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
+import com.github.chrisruffalo.eeconfig.annotations.AutoLogger;
 import com.github.chrisruffalo.eeconfig.annotations.Configuration;
 import com.github.chrisruffalo.eeconfig.mime.MimeGuesser;
 import com.github.chrisruffalo.eeconfig.mime.SupportedType;
@@ -31,6 +32,7 @@ import com.github.chrisruffalo.eeconfig.resources.configuration.source.IConfigur
 public class PropertiesConfigurationProducer extends AbstractConfigurationProducer {
 	
 	@Inject
+	@AutoLogger
 	private Logger logger;
 	
 	/**
