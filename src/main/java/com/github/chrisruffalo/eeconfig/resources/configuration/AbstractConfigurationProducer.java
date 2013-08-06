@@ -72,20 +72,20 @@ public abstract class AbstractConfigurationProducer {
 		ConfigurationSourceLocator locator = null;
 		Class<? extends ConfigurationSourceLocator> sourceLocatorClass = configuration.locator();
 		if(sourceLocatorClass == null) {
-			this.logger.info("No alternate locator provided, using default");
+			this.logger.debug("No alternate locator provided, using default");
 			sourceLocatorClass = DefaultConfigurationSourceLocator.class;
 		} else {
-			this.logger.info("Requesting alternate locator: {}", sourceLocatorClass.getName());
+			this.logger.debug("Requesting alternate locator: {}", sourceLocatorClass.getName());
 		} 
 		locator = this.resolveBean(sourceLocatorClass, DefaultConfigurationSourceLocator.class);
 				
 		PropertyResolver resolver = null;
 		Class<? extends PropertyResolver> propertyResolverClass = configuration.propertyResolver();
 		if(propertyResolverClass == null) {
-			this.logger.info("No alternate property resolver provided, using default");
+			this.logger.debug("No alternate property resolver provided, using default");
 			propertyResolverClass = DefaultPropertyResolver.class;
 		} else {
-			this.logger.info("Requesting alternate property resolver: {}", propertyResolverClass.getName());
+			this.logger.debug("Requesting alternate property resolver: {}", propertyResolverClass.getName());
 		}
 		resolver = this.resolveBean(propertyResolverClass, DefaultPropertyResolver.class);
 		locator.setPropertyResolver(resolver);
@@ -116,12 +116,12 @@ public abstract class AbstractConfigurationProducer {
 		// if no candidates are available, resolve
 		// using next class up
 		if(!candidates.iterator().hasNext()) {
-			this.logger.info("No candidates for: {}", typeToResolve.getName());
+			this.logger.debug("No candidates for: {}", typeToResolve.getName());
 			// try and resolve only the default type
 			return resolveBean(defaultType, null);
 		} 
 		
-		this.logger.info("Requesting resolution on: {}", typeToResolve.getName());
+		this.logger.debug("Requesting resolution on: {}", typeToResolve.getName());
 		
 		// get candidate
 		Bean<?> bean = candidates.iterator().next();
@@ -129,7 +129,7 @@ public abstract class AbstractConfigurationProducer {
 		Type type = (Type) bean.getTypes().iterator().next();
 	    B result = (B)this.manager.getReference(bean, type, context);
 		
-		this.logger.info("Resolved to: {}", result.getClass().getName());
+		this.logger.debug("Resolved to: {}", result.getClass().getName());
 		
 		return result;
 	}
