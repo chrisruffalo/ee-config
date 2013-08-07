@@ -51,8 +51,7 @@
 		<connection>scm:git:git@github.com:chrisruffalo/ee-config.git</connection>
 		<url>scm:git:git@github.com:chrisruffalo/ee-config.git</url>
 		<developerConnection>scm:git:git@github.com:chrisruffalo/ee-config.git</developerConnection>
-	  <tag>HEAD</tag>
-  </scm>
+	</scm>
 
 	<!-- licensing information -->
 	<licenses>
