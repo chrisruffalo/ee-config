@@ -51,7 +51,7 @@
 		<connection>scm:git:git@github.com:chrisruffalo/ee-config.git</connection>
 		<url>scm:git:git@github.com:chrisruffalo/ee-config.git</url>
 		<developerConnection>scm:git:git@github.com:chrisruffalo/ee-config.git</developerConnection>
-  	  	<tag>true</tag>
+  	  	<tag>1.4</tag>
 	</scm>
 
 	<!-- licensing information -->
