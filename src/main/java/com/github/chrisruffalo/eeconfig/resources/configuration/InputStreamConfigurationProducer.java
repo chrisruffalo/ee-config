@@ -7,12 +7,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
+import com.github.chrisruffalo.eeconfig.annotations.AutoLogger;
 import com.github.chrisruffalo.eeconfig.annotations.Configuration;
 import com.github.chrisruffalo.eeconfig.resources.configuration.source.IConfigurationSource;
 
@@ -23,9 +25,11 @@ import com.github.chrisruffalo.eeconfig.resources.configuration.source.IConfigur
  * @author Chris Ruffalo
  *
  */
+@ApplicationScoped
 public class InputStreamConfigurationProducer extends AbstractConfigurationProducer {
 
 	@Inject
+	@AutoLogger
 	private Logger logger;
 	
 	@Produces

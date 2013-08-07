@@ -8,12 +8,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
+import com.github.chrisruffalo.eeconfig.annotations.AutoLogger;
 import com.github.chrisruffalo.eeconfig.annotations.Configuration;
 import com.github.chrisruffalo.eeconfig.mime.MimeGuesser;
 import com.github.chrisruffalo.eeconfig.mime.SupportedType;
@@ -26,9 +28,11 @@ import com.github.chrisruffalo.eeconfig.resources.configuration.source.IConfigur
  * @author Chris Ruffalo
  *
  */
+@ApplicationScoped
 public class PropertiesConfigurationProducer extends AbstractConfigurationProducer {
 	
 	@Inject
+	@AutoLogger
 	private Logger logger;
 	
 	/**

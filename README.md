@@ -41,7 +41,7 @@ Adding this dependency to your project should be as simple as:
 <dependency>
   <groupId>com.github.chrisruffalo</groupId>
   <artifactId>ee-config</artifactId>
-  <version>1.2</version>
+  <version>1.3</version>
 </dependency>
 ```
 
@@ -49,12 +49,13 @@ The project 'ee-config' has been in maven central since version 1.0.
 
 ### Logging
 
-Because we find it useful and because I use it all the time this library includes a method injecting a SLF4J logger.
+Because we find it useful and because I use it all the time this library includes a method injecting a SLF4J logger.  The '@AutoLogger' qualifier is uesd so that the included Logger producer can easily be ignored or overriden.
 
 ``` java
 public class INeedALogger {
 	
 	@Inject
+	@AutoLogger
 	private Logger logger;
 	
 	@PostConstruct
@@ -221,9 +222,43 @@ public class ConfigureMeAnInputStream {
 
 You should also note that the 'merge' flag has no effect in this injection context.
 
+#### Example 5: Raw Input Sources
+
+For something a little more advanced you can inject [IConfigurationSource](src/main/java/com/github/chrisruffalo/eeconfig/resources/configuration/source/IConfigurationSource.java) objects directly!  This gives fairly fine grained control over how the streams are loaded and handled.
+
+``` java
+public class ConfigureFromRawSources {
+	@Inject
+	@Configuration(
+		paths = {
+			"${jboss.server.config.dir}/application/main.properties" // main configuration
+			"resource:default.properties" // will look on classpath for default properties
+		},
+		resolveSystemProperties = true, // resolves system properties in paths
+	)
+	private List<IConfigurationSource> configSources; 
+	
+	@PostConstruct
+	private void init() {
+		// loop through available sources
+		for(IConfigurationSource source : this.configSources) {
+			// if a source is not available, move on
+			if(!source.available()) {
+				continue;
+			}
+
+			// if the source is available, get the stream
+			InputStream stream = source.stream();
+
+			// implement reading the stream where you want it to go...
+		}
+	}
+}
+```
+
 ### But... I don't like any of those examples!
 
-Well, man, I don't know what to tell you... maybe you need to *implement your own custom injection type*.
+Well, man, I don't know what to tell you... maybe you need to *implement your own custom injection producer*.
 
 ```java
 public class MyCustomConfigurationProducer extends AbstractConfigurationProducer {
@@ -259,6 +294,8 @@ There are two extendable behaviors in EE-Config.  Each of these is governed by a
 
 **Each of these strategies *must* have a public no-arg constructor.**  If they do not then they will not be usable and the default implementation of each will be used instead.
 
+*It should be noted* that these classes will be loaded as **beans** by the CDI container.  This means that they are free to have CDI features of their own.  It would be possible to read from a database or otherwise inject other behavior into your bean implementation.  The intent is to make these strategies as flexible as possible.
+
 ### Configuration source and resource location
 
 The [ConfigurationSourceLocator](src/main/java/com/github/chrisruffalo/eeconfig/strategy/locator/ConfigurationSourceLocator.java) is the interface for creating custom locators for the configuration sources.  The [default implementation](src/main/java/com/github/chrisruffalo/eeconfig/strategy/locator/DefaultConfigurationSourceLocator.java) is normally used for finding files and resources.
@@ -290,6 +327,7 @@ public class ConfigureMeWithCustomBehavior {
 	}
 }
 ```
+
 This example shows the possibility of using a custom resolver to resolve a different token type (@@jboss.server.config.dir@@) and a custom locator that could possibly resolve files a little differently.  Overriding the default behavior is that simple.
 
 ## Issues
