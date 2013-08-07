@@ -41,7 +41,7 @@ Adding this dependency to your project should be as simple as:
 <dependency>
   <groupId>com.github.chrisruffalo</groupId>
   <artifactId>ee-config</artifactId>
-  <version>1.3</version>
+  <version>1.4</version>
 </dependency>
 ```
 
