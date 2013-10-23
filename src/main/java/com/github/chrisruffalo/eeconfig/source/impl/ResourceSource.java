@@ -1,12 +1,12 @@
-package com.github.chrisruffalo.eeconfig.resources.configuration.source;
+package com.github.chrisruffalo.eeconfig.source.impl;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.net.URL;
 
-public class ResourceConfigurationSource extends ConfigurationSource {
+public class ResourceSource extends BaseSource {
 
-	public ResourceConfigurationSource(String path) {
+	public ResourceSource(String path) {
 		this.setPath(path);
 	}
 	

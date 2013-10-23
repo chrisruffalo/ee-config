@@ -20,6 +20,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.github.chrisruffalo.eeconfig.annotations.Configuration;
+import com.github.chrisruffalo.eeconfig.annotations.Source;
+import com.github.chrisruffalo.eeconfig.strategy.locator.ResourceLocator;
 import com.github.chrisruffalo.eeconfig.support.DeploymentFactory;
 import com.google.common.io.ByteStreams;
 
@@ -102,7 +104,7 @@ public class CommonsConfigurationProducerTest {
 	 */
 	@Test
 	@Inject
-	public void testEmptyPaths(@Configuration(paths={}) org.apache.commons.configuration.Configuration properties) {
+	public void testEmptyPaths(@Configuration org.apache.commons.configuration.Configuration properties) {
 		Assert.assertNotNull(properties);
 		Assert.assertTrue(properties.isEmpty());
 	}
@@ -114,7 +116,15 @@ public class CommonsConfigurationProducerTest {
 	 */
 	@Test
 	@Inject
-	public void testNonexistantPaths(@Configuration(paths={"resource:no/path/here.properties","/bad/path/file.properties"}) org.apache.commons.configuration.Configuration properties) {
+	public void testNonexistantPaths(
+			@Configuration(
+				sources={
+					@Source(value="no/path/here.properties", locator=ResourceLocator.class),
+					@Source(value="/bad/path/file.properties", locator=ResourceLocator.class)
+				}
+			) 
+			org.apache.commons.configuration.Configuration properties
+		) {
 		Assert.assertNotNull(properties);
 		Assert.assertTrue(properties.isEmpty());
 	}
@@ -127,13 +137,16 @@ public class CommonsConfigurationProducerTest {
 	 */
 	@Test
 	@Inject
-	public void testNoMergeResources(@Configuration(
-		paths = {
-			"resource:properties/priority1.properties",
-			"resource:properties/priority2.properties",
-			"resource:properties/priority3.properties"
-		}
-	) org.apache.commons.configuration.Configuration properties) {
+	public void testNoMergeResources(			
+		@Configuration(
+			sources={
+				@Source(value="properties/priority1.properties", locator=ResourceLocator.class),
+				@Source(value="properties/priority2.properties", locator=ResourceLocator.class),
+				@Source(value="properties/priority3.properties", locator=ResourceLocator.class),
+			}
+		) 
+		org.apache.commons.configuration.Configuration properties) 
+	{
 		Assert.assertNotNull(properties);
 		// this one has content
 		Assert.assertFalse(properties.isEmpty());
@@ -156,13 +169,16 @@ public class CommonsConfigurationProducerTest {
 	 */
 	@Test
 	@Inject
-	public void testNoMergeResourcesWithDifferentOrder(@Configuration(
-		paths = {
-			"resource:properties/priority2.properties",
-			"resource:properties/priority1.properties",
-			"resource:properties/priority3.properties"
-		}
-	) org.apache.commons.configuration.Configuration properties) {
+	public void testNoMergeResourcesWithDifferentOrder(			
+		@Configuration(
+			sources={
+				@Source(value="properties/priority2.properties", locator=ResourceLocator.class),
+				@Source(value="properties/priority1.properties", locator=ResourceLocator.class),
+				@Source(value="properties/priority3.properties", locator=ResourceLocator.class),
+			}
+		) 
+		org.apache.commons.configuration.Configuration properties) 
+	{
 		Assert.assertNotNull(properties);
 		// this one has content
 		Assert.assertFalse(properties.isEmpty());
@@ -181,14 +197,17 @@ public class CommonsConfigurationProducerTest {
 	 */
 	@Test
 	@Inject
-	public void testMergedResources(@Configuration(
-		paths = {
-			"resource:properties/priority1.properties",
-			"resource:properties/priority2.properties",
-			"resource:properties/priority3.properties"
-		},
-		merge = true
-	) org.apache.commons.configuration.Configuration properties) {
+	public void testMergedResources(		
+		@Configuration(
+			sources = {
+				@Source(value="properties/priority1.properties", locator=ResourceLocator.class),
+				@Source(value="properties/priority2.properties", locator=ResourceLocator.class),
+				@Source(value="properties/priority3.properties", locator=ResourceLocator.class),
+			},
+			merge = true
+		) 
+		org.apache.commons.configuration.Configuration properties) 
+	{
 		Assert.assertNotNull(properties);
 		// this one has content
 		Assert.assertFalse(properties.isEmpty());
@@ -214,15 +233,17 @@ public class CommonsConfigurationProducerTest {
 	 */
 	@Test
 	@Inject
-	public void testMergeFilesWithSystemPropertiesAndMixedResource(@Configuration(
-		paths = {
-			"${java.io.tmpdir}/priority2.properties",
-			"${java.io.tmpdir}/priority1.properties",
-			"resource:properties/priority3.properties"
-		},
-		resolveSystemProperties = true,
-		merge = true
-	) org.apache.commons.configuration.Configuration properties) {
+	public void testMergeFilesWithSystemPropertiesAndMixedResource(		
+		@Configuration(
+			sources = {
+				@Source(value="${java.io.tmpdir}/priority2.properties", resolve=true),
+				@Source(value="${java.io.tmpdir}/priority1.properties", resolve=true),
+				@Source(value="properties/priority3.properties", locator=ResourceLocator.class),
+			},
+			merge = true
+		) 
+		org.apache.commons.configuration.Configuration properties) 
+	{
 		Assert.assertNotNull(properties);
 		// this one has content
 		Assert.assertFalse(properties.isEmpty());
@@ -244,15 +265,17 @@ public class CommonsConfigurationProducerTest {
 	 */
 	@Test
 	@Inject
-	public void testMergeFilesWithoutSystemPropertiesAndMixedResource(@Configuration(
-		paths = {
-			"${java.io.tmpdir}/priority2.properties",
-			"${java.io.tmpdir}/priority1.properties",
-			"resource:properties/priority3.properties"
-		},
-		resolveSystemProperties = false,
-		merge = true
-	) org.apache.commons.configuration.Configuration properties) {
+	public void testMergeFilesWithoutSystemPropertiesAndMixedResource(
+		@Configuration(
+			sources = {
+				@Source(value="${java.io.tmpdir}/priority2.properties", resolve=false),
+				@Source(value="${java.io.tmpdir}/priority1.properties", resolve=false),
+				@Source(value="properties/priority3.properties", locator=ResourceLocator.class),
+			},
+			merge = true
+		) 
+		org.apache.commons.configuration.Configuration properties) 
+	{
 		Assert.assertNotNull(properties);
 		// this one has content
 		Assert.assertFalse(properties.isEmpty());

@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 
 import com.github.chrisruffalo.eeconfig.annotations.AutoLogger;
 import com.github.chrisruffalo.eeconfig.annotations.Configuration;
-import com.github.chrisruffalo.eeconfig.resources.configuration.source.IConfigurationSource;
+import com.github.chrisruffalo.eeconfig.source.ISource;
 
 /**
  * Produces raw InputStreams for implementing custom configuration
@@ -33,37 +33,37 @@ public class InputStreamConfigurationProducer extends AbstractConfigurationProdu
 	private Logger logger;
 	
 	@Produces
-	@Configuration(paths={})
+	@Configuration
 	public InputStream getInputStream(InjectionPoint injectionPoint) {
 		// get configuration annotation
 		Configuration annotation = this.getAnnotation(injectionPoint);
 		
 		// get input streams
-		List<IConfigurationSource> sources = this.locate(annotation);
+		List<ISource> sources = this.locate(annotation);
 		
 		// return the first stream
-		return sources.get(0).stream();
+		return sources.get(0).stream();	
 	}
 	
 	@Produces
-	@Configuration(paths={})
+	@Configuration
 	public List<InputStream> getInputStreams(InjectionPoint injectionPoint) {
 		// get configuration annotation
 		Configuration annotation = this.getAnnotation(injectionPoint);
 		
 		// get sources
-		List<IConfigurationSource> sources = this.locate(annotation);
+		List<ISource> sources = this.locate(annotation);
 		
 		// get input streams
 		List<InputStream> streams = new ArrayList<InputStream>(sources.size());
 		
 		// go through the sources and add them
-		for(IConfigurationSource source : sources) {
+		for(ISource source : sources) {
 			if(!source.available()) {
-				this.logger.info("Source is not available: {}", source.getPath());
+				this.logger.trace("Source is not available: {}", source.getPath());
 				continue;
 			}
-			this.logger.info("Source available: {}", source.getPath());
+			this.logger.trace("Source available: {}", source.getPath());
 			streams.add(source.stream());
 		}
 		

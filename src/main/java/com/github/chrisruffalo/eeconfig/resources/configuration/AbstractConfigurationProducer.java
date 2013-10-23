@@ -2,6 +2,8 @@ package com.github.chrisruffalo.eeconfig.resources.configuration;
 
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -15,9 +17,11 @@ import org.slf4j.Logger;
 
 import com.github.chrisruffalo.eeconfig.annotations.AutoLogger;
 import com.github.chrisruffalo.eeconfig.annotations.Configuration;
-import com.github.chrisruffalo.eeconfig.resources.configuration.source.IConfigurationSource;
-import com.github.chrisruffalo.eeconfig.strategy.locator.ConfigurationSourceLocator;
-import com.github.chrisruffalo.eeconfig.strategy.locator.DefaultConfigurationSourceLocator;
+import com.github.chrisruffalo.eeconfig.annotations.Source;
+import com.github.chrisruffalo.eeconfig.source.ISource;
+import com.github.chrisruffalo.eeconfig.source.impl.UnfoundSource;
+import com.github.chrisruffalo.eeconfig.strategy.locator.ISourceLocator;
+import com.github.chrisruffalo.eeconfig.strategy.locator.NullLocator;
 import com.github.chrisruffalo.eeconfig.strategy.property.DefaultPropertyResolver;
 import com.github.chrisruffalo.eeconfig.strategy.property.PropertyResolver;
 
@@ -58,65 +62,93 @@ public abstract class AbstractConfigurationProducer {
 	 * 
 	 * @return List of InputStreams representing the configuration found
 	 */
-	protected List<IConfigurationSource> locate(Configuration configuration) {
+	protected List<ISource> locate(Configuration configuration) {
 				
 		if(configuration == null) {
 			throw new IllegalArgumentException("A non-null Configuration annotation must be provided");
 		}
 		
-		ConfigurationSourceLocator locator = null;
-		Class<? extends ConfigurationSourceLocator> sourceLocatorClass = configuration.locator();
-		if(sourceLocatorClass == null) {
-			this.logger.debug("No alternate locator provided, using default");
-			sourceLocatorClass = DefaultConfigurationSourceLocator.class;
-		} else {
-			this.logger.debug("Requesting alternate locator: {}", sourceLocatorClass.getName());
-		} 
-		locator = this.resolveBean(sourceLocatorClass, DefaultConfigurationSourceLocator.class);
-				
 		PropertyResolver resolver = null;
-		Class<? extends PropertyResolver> propertyResolverClass = configuration.propertyResolver();
+		Class<? extends PropertyResolver> propertyResolverClass = configuration.resolver();
 		if(propertyResolverClass == null) {
 			this.logger.debug("No alternate property resolver provided, using default");
 			propertyResolverClass = DefaultPropertyResolver.class;
 		} else {
 			this.logger.debug("Requesting alternate property resolver: {}", propertyResolverClass.getName());
 		}
-		resolver = this.resolveBean(propertyResolverClass, DefaultPropertyResolver.class);
-		locator.setPropertyResolver(resolver);
-				
-		// locate through the location source
-		List<IConfigurationSource> sources = locator.locate(configuration);
+		resolver = this.resolveBeanWithDefaultClass(propertyResolverClass, DefaultPropertyResolver.class);
 		
-		return sources;
-	}	
+		// found sources
+		List<ISource> foundSources = new ArrayList<ISource>(0);
+		
+		// create sources
+		List<Source> sources = new ArrayList<Source>(Arrays.asList(configuration.sources()));
+		
+		// resolve sources as normal
+		for(Source source : sources) {
+			ISource found = this.resloveSource(source, resolver);
+			if(found != null) {
+				foundSources.add(found);
+			}
+		}
+		
+		// handle special case where default source is found AND resolved
+		if(configuration.defaultSource() != null) {
+			Source defaultSource = configuration.defaultSource();
+			ISource foundDefault = this.resloveSource(defaultSource, resolver);
+			if(foundDefault != null && foundDefault.available()) {
+				foundSources.add(foundDefault);
+			}
+		}
+		
+		// fix no sources found, a source SHOULD always be returned
+		if(foundSources.isEmpty()) {
+			foundSources.add(new UnfoundSource());
+		}
+		
+		return foundSources;
+	}
+	
+	private ISource resloveSource(Source source, PropertyResolver resolver) {
+		Class<? extends ISourceLocator> locatorClass = source.locator();
+		if(locatorClass == null) {
+			locatorClass = NullLocator.class;
+		}
+		ISourceLocator locator = this.resolveBeanWithDefaultClass(locatorClass, NullLocator.class);
+		this.logger.trace("Using locator: '{}'", locator.getClass().getName());
+		
+		ISource foundSource = locator.locate(source, resolver);
+		this.logger.trace("Found source: '{}' (using locator '{}')", foundSource, locator.getClass().getName());
+		return foundSource;
+	}
 	
 	/**
-	 * Resolve managed bean for given types
+	 * Resolve managed bean for given type
 	 * 
 	 * @param typeToResolve
 	 * @param defaultType
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	private <B, T extends B, D extends B> B resolveBean(Class<T> typeToResolve, Class<D> defaultType) {
+	private <B, T extends B, D extends B> B resolveBeanWithDefaultClass(Class<T> typeToResolve, Class<D> defaultType) {
 
-		// null request leads to null resolution
+		// if type to resolve is null, do nothing, not even the default
 		if(typeToResolve == null) {
 			return null;
 		}
 		
+		// get candidate resolve types
 		Set<Bean<?>> candidates = this.manager.getBeans(typeToResolve);
 		
 		// if no candidates are available, resolve
 		// using next class up
 		if(!candidates.iterator().hasNext()) {
-			this.logger.debug("No candidates for: {}", typeToResolve.getName());
+			this.logger.trace("No candidates for: {}", typeToResolve.getName());
 			// try and resolve only the default type
-			return resolveBean(defaultType, null);
+			return resolveBeanWithDefaultClass(defaultType, null);
 		} 
 		
-		this.logger.debug("Requesting resolution on: {}", typeToResolve.getName());
+		this.logger.trace("Requesting resolution on: {}", typeToResolve.getName());
 		
 		// get candidate
 		Bean<?> bean = candidates.iterator().next();
@@ -124,7 +156,7 @@ public abstract class AbstractConfigurationProducer {
 		Type type = (Type) bean.getTypes().iterator().next();
 	    B result = (B)this.manager.getReference(bean, type, context);
 		
-		this.logger.debug("Resolved to: {}", result.getClass().getName());
+		this.logger.trace("Resolved to: {}", result.getClass().getName());
 		
 		return result;
 	}

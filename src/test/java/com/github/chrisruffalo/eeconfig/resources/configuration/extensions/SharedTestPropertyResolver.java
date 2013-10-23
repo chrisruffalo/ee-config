@@ -13,7 +13,7 @@ public class SharedTestPropertyResolver extends DefaultPropertyResolver {
 	
 	@Override
 	public String resolveProperties(String fullString, Map<String, String> additionalProperties) {
-		count++;
+		this.count++;
 		return super.resolveProperties(fullString, additionalProperties);
 	}
 

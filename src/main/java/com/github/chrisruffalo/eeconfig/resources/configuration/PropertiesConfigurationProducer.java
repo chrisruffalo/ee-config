@@ -19,7 +19,7 @@ import com.github.chrisruffalo.eeconfig.annotations.AutoLogger;
 import com.github.chrisruffalo.eeconfig.annotations.Configuration;
 import com.github.chrisruffalo.eeconfig.mime.MimeGuesser;
 import com.github.chrisruffalo.eeconfig.mime.SupportedType;
-import com.github.chrisruffalo.eeconfig.resources.configuration.source.IConfigurationSource;
+import com.github.chrisruffalo.eeconfig.source.ISource;
 
 /**
  * Resolves the {@link Configuration} annotation for injection
@@ -44,18 +44,18 @@ public class PropertiesConfigurationProducer extends AbstractConfigurationProduc
 	 * 		   configuration files (if found)
 	 */
 	@Produces
-	@Configuration(paths={})
+	@Configuration
 	public Properties getProperties(InjectionPoint injectionPoint) {
 		// properties should be stored here
 		Properties properties = new Properties();
 		
 		// locate configurations
 		Configuration configuration = this.getAnnotation(injectionPoint);
-		List<IConfigurationSource> found = this.locate(configuration);
+		List<ISource> found = this.locate(configuration);
 		
 		// input stream list is immutable, copy so we can reverse
 		// if it needs merge
-		List<IConfigurationSource> copy = new ArrayList<IConfigurationSource>(found);
+		List<ISource> copy = new ArrayList<ISource>(found);
 		
 		// when merged the lowest priority should go first
 		// since the list comes in the order where the
@@ -69,7 +69,7 @@ public class PropertiesConfigurationProducer extends AbstractConfigurationProduc
 		this.logger.trace("Found {} streams to load properties from", copy.size());
 		
 		// load each properties item individually
-		for(IConfigurationSource source : copy) {
+		for(ISource source : copy) {
 			// get type for stream
 			SupportedType type = MimeGuesser.guess(source);
 			

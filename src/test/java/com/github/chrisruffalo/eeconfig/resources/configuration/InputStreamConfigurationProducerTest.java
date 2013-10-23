@@ -17,6 +17,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.github.chrisruffalo.eeconfig.annotations.Configuration;
+import com.github.chrisruffalo.eeconfig.annotations.Source;
+import com.github.chrisruffalo.eeconfig.strategy.locator.ResourceLocator;
 import com.github.chrisruffalo.eeconfig.support.DeploymentFactory;
 
 @RunWith(Arquillian.class)
@@ -37,7 +39,7 @@ public class InputStreamConfigurationProducerTest {
 	 */
 	@Test
 	@Inject
-	public void testEmptyPaths(@Configuration(paths={}) InputStream stream) throws IOException {
+	public void testEmptyPaths(@Configuration InputStream stream) throws IOException {
 		Assert.assertNotNull(stream);
 		Assert.assertEquals(0, stream.available());
 	}
@@ -52,8 +54,11 @@ public class InputStreamConfigurationProducerTest {
 	@Inject
 	public void testNonexistantPaths(
 		@Configuration(
-			paths={"resource:no/path/here.properties","/bad/path/file.properties"}
-		) 
+			sources={
+				@Source(value="no/path/here.properties"),
+				@Source(value="/bad/path/file.properties")
+			}
+		)		
 		InputStream stream
 	) throws IOException {
 		Assert.assertNotNull(stream);
@@ -72,11 +77,11 @@ public class InputStreamConfigurationProducerTest {
 	@Inject
 	public void testStreamCanBeLoaded(
 		@Configuration(
-			paths={"resource:properties/priority1.properties"}
+			sources=@Source(value="properties/priority1.properties", locator=ResourceLocator.class) 
 		) 
 		InputStream stream,
 		@Configuration(
-			paths={"resource:properties/priority1.properties"}
+			sources=@Source(value="properties/priority1.properties", locator=ResourceLocator.class)
 		) 
 		Properties properties
 	) throws IOException {
@@ -110,10 +115,10 @@ public class InputStreamConfigurationProducerTest {
 	@Test
 	@Inject
 	public void loadInputStreams(@Configuration(
-		paths = {
-			"resource:properties/priority1.properties",
-			"resource:properties/priority2.properties",
-			"resource:properties/priority3.properties"
+		sources = {
+			@Source(value="properties/priority1.properties", locator=ResourceLocator.class),
+			@Source(value="properties/priority2.properties", locator=ResourceLocator.class),
+			@Source(value="properties/priority3.properties", locator=ResourceLocator.class)
 		}
 	) List<InputStream> streams) {
 		Assert.assertNotNull(streams);

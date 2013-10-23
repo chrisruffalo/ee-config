@@ -1,9 +1,11 @@
-package com.github.chrisruffalo.eeconfig.resources.configuration.source;
+package com.github.chrisruffalo.eeconfig.source.impl;
 
 import java.io.InputStream;
 
-public abstract class ConfigurationSource implements IConfigurationSource {
-	
+import com.github.chrisruffalo.eeconfig.source.ISource;
+
+public abstract class BaseSource implements ISource {
+
 	private String path;
 	
 	/**
@@ -48,6 +50,11 @@ public abstract class ConfigurationSource implements IConfigurationSource {
 		String ext = this.path.substring(this.path.lastIndexOf('.')+1);
 		// return
 		return ext;
+	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName() + " [available: " + this.available() + "]";
 	}
 	
 }

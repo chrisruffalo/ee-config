@@ -39,7 +39,7 @@ public final class DeploymentFactory {
 		archive.addPackages(true, "com.github.chrisruffalo.eeconfig");
 		
 		// as a bean-enabled archive
-		archive.addAsResource("META-INF/beans.xml");
+		archive.addAsWebInfResource("META-INF/beans.xml", "beans.xml");
 		
 		// load libraries
 		MavenDependencyResolver resolver = DependencyResolvers.use(MavenDependencyResolver.class);

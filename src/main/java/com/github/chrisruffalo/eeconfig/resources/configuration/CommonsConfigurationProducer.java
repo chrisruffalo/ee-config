@@ -21,8 +21,15 @@ import com.github.chrisruffalo.eeconfig.annotations.AutoLogger;
 import com.github.chrisruffalo.eeconfig.annotations.Configuration;
 import com.github.chrisruffalo.eeconfig.mime.MimeGuesser;
 import com.github.chrisruffalo.eeconfig.mime.SupportedType;
-import com.github.chrisruffalo.eeconfig.resources.configuration.source.IConfigurationSource;
+import com.github.chrisruffalo.eeconfig.source.ISource;
 
+/**
+ * Provides configuration injections to satisfy injection points for various
+ * Commons Configuration types
+ * 
+ * @author Chris Ruffalo
+ *
+ */
 @ApplicationScoped
 public class CommonsConfigurationProducer extends AbstractConfigurationProducer {
 
@@ -31,20 +38,20 @@ public class CommonsConfigurationProducer extends AbstractConfigurationProducer 
 	private Logger logger;
 	
 	@Produces
-	@Configuration(paths={})
+	@Configuration
 	public org.apache.commons.configuration.Configuration getConfiguration(InjectionPoint injectionPoint) {
 		// get configuration annotation
 		Configuration annotation = this.getAnnotation(injectionPoint);
 		
 		// get input streams
-		List<IConfigurationSource> sources = this.locate(annotation);
+		List<ISource> sources = this.locate(annotation);
 		
 		// create configuration combiner
 		OverrideCombiner combiner = new OverrideCombiner();
 		CombinedConfiguration combined = new CombinedConfiguration(combiner);
 		
 		// combine configurations
-		for(IConfigurationSource source : sources) {
+		for(ISource source : sources) {
 			// determine mime type in order to create proper commons object
 			SupportedType type = MimeGuesser.guess(source);
 			

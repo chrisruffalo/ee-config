@@ -1,17 +1,8 @@
-package com.github.chrisruffalo.eeconfig.resources.configuration.source;
+package com.github.chrisruffalo.eeconfig.source;
 
 import java.io.InputStream;
 
-/**
- * Abstract view of a configuration source.  This allows
- * an implementor to read and view the details of the
- * source without being worried how it was found or how
- * to "open" it's stream.
- * 
- * @author Chris Ruffalo
- *
- */
-public interface IConfigurationSource {
+public interface ISource {
 
 	/**
 	 * Is the source available/readable.
@@ -40,5 +31,5 @@ public interface IConfigurationSource {
 	 * @return
 	 */
 	String getExtension();
-
+	
 }

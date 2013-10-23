@@ -8,7 +8,7 @@ import java.net.URLConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.chrisruffalo.eeconfig.resources.configuration.source.IConfigurationSource;
+import com.github.chrisruffalo.eeconfig.source.ISource;
 
 /**
  * Simple helper for guessing a condensed MIME type.
@@ -27,7 +27,7 @@ public class MimeGuesser {
 	 * 
 	 * @return guessed type from the set of supported types
 	 */
-	public static SupportedType guess(IConfigurationSource source) {
+	public static SupportedType guess(ISource source) {
 		// create logger
 		Logger logger = LoggerFactory.getLogger(MimeGuesser.class);
 		

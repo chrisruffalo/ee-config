@@ -1,15 +1,15 @@
-package com.github.chrisruffalo.eeconfig.resources.configuration.source;
+package com.github.chrisruffalo.eeconfig.source.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-public class UnfoundConfigurationSource extends ConfigurationSource {
+public class UnfoundSource extends BaseSource {
 
-	public UnfoundConfigurationSource() {
+	public UnfoundSource() {
 		this("");
 	}
 	
-	public UnfoundConfigurationSource(String path) {
+	public UnfoundSource(String path) {
 		this.setPath(path);
 	}
 
