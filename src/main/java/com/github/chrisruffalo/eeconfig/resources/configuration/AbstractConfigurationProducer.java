@@ -209,10 +209,14 @@ public abstract class AbstractConfigurationProducer {
 			path = resolver.resolveProperties(path, bootstrapMap, defaultMap);
 		}
 		
+		// log path
+		this.logger.trace("Looking for source at path: '{}'", path);
+		
 		// locate
 		ISource foundSource = locator.locate(path);
 		
-		this.logger.trace("Found source: '{}' (using locator '{}')", foundSource, locator.getClass().getName());
+		// log results
+		this.logger.trace("Source: '{}' (using locator '{}')", foundSource, locator.getClass().getName());
 		return foundSource;
 	}
 	
