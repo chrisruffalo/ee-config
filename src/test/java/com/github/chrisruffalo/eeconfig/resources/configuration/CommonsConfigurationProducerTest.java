@@ -13,7 +13,7 @@ import javax.inject.Inject;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -33,9 +33,8 @@ public class CommonsConfigurationProducerTest {
 	//private Logger logger;
 	
 	@Deployment
-	public static WebArchive deployment() {
-		WebArchive archive = DeploymentFactory.createDeployment();
-
+	public static JavaArchive deployment() {
+		JavaArchive archive = DeploymentFactory.createDeployment();
 		return archive;
 	}
 	

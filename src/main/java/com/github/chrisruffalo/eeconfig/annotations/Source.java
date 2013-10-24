@@ -11,8 +11,8 @@ import java.lang.annotation.Target;
 import javax.enterprise.util.Nonbinding;
 import javax.inject.Qualifier;
 
-import com.github.chrisruffalo.eeconfig.strategy.locator.FileSourceLocator;
-import com.github.chrisruffalo.eeconfig.strategy.locator.ISourceLocator;
+import com.github.chrisruffalo.eeconfig.strategy.locator.FileLocator;
+import com.github.chrisruffalo.eeconfig.strategy.locator.Locator;
 
 @Inherited
 @Qualifier
@@ -26,5 +26,5 @@ public @interface Source {
 	boolean resolve() default false;
 	
 	@Nonbinding
-	Class<? extends ISourceLocator> locator() default FileSourceLocator.class;
+	Class<? extends Locator> locator() default FileLocator.class;
 }

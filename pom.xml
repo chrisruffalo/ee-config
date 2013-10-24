@@ -1,379 +1,280 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.github.chrisruffalo</groupId>
-	<artifactId>ee-config</artifactId>
-	<version>1.4-SNAPSHOT</version>
-	<packaging>jar</packaging>
-	<name>ee-config</name>
-	<description>annotations and helpers for easier configuration of ee applications</description>
-	<url>https://github.com/chrisruffalo/ee-config</url>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.github.chrisruffalo</groupId>
+    <artifactId>ee-config</artifactId>
+    <version>1.4-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <name>ee-config</name>
+    <description>annotations and helpers for easier configuration of ee applications</description>
+    <url>https://github.com/chrisruffalo/ee-config</url>
 
-	<!-- use sonatype parent for releases -->
-	<parent>
-		<groupId>org.sonatype.oss</groupId>
-		<artifactId>oss-parent</artifactId>
-		<version>7</version>
-	</parent>
+    <!-- use sonatype parent for releases -->
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
 
-	<properties>
-		<!-- source output version -->
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <properties>
+        <!-- source output version -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<!-- product/dependency versions, based on EAP6/AS7.1.1 included versions -->
-		<!-- https://access.redhat.com/knowledge/articles/112673 -->
-		<jee6.version>3.0.1.Final</jee6.version>
-		<jboss-as.version>7.1.1.Final</jboss-as.version>
-		<slf4j.version>1.6.1</slf4j.version> <!-- from JBoss Logging 3.1.X.GA and Hibernate Validator -->
-		<guava.version>11.0.2</guava.version> <!-- bundled with jboss as 7.1 and eap 6.0x -->
-		<commons.configuration.version>1.9</commons.configuration.version>
+        <!-- configuration version -->
+        <commons.configuration.version>1.9</commons.configuration.version>
 
-		<!-- arquillian testing -->
-		<arquillian.version>1.0.3.Final</arquillian.version>
+        <!-- arquillian testing -->
+        <arquillian.version>1.1.1.Final</arquillian.version>
+        
+        <!-- timesetamp magic / property replacement -->
+        <maven.build.timestamp.format>yyyy/MM/dd - hh:mm:ss a (Z)</maven.build.timestamp.format>
+        <local.build.timestamp>${maven.build.timestamp}</local.build.timestamp>
+    </properties>
+    
+    <!-- developers -->
+    <developers>
+        <developer>
+            <name>Chris Ruffalo</name>
+            <id>cruffalo</id>
+        </developer>
+    </developers>
+    
+    <!-- scm information for buildnumber plugin and maven releases -->
+    <scm>
+        <connection>scm:git:git@github.com:chrisruffalo/ee-config.git</connection>
+        <url>scm:git:git@github.com:chrisruffalo/ee-config.git</url>
+        <developerConnection>scm:git:git@github.com:chrisruffalo/ee-config.git</developerConnection>
+    </scm>
 
-		<!-- junit -->
-		<junit.version>4.11</junit.version>
-		
-		<!-- timesetamp magic / property replacement -->
-		<maven.build.timestamp.format>yyyy/MM/dd - hh:mm:ss a (Z)</maven.build.timestamp.format>
-		<local.build.timestamp>${maven.build.timestamp}</local.build.timestamp>
-	</properties>
-	
-	<!-- developers -->
-	<developers>
-		<developer>
-			<name>Chris Ruffalo</name>
-			<id>cruffalo</id>
-		</developer>
-	</developers>
-	
-	<!-- scm information for buildnumber plugin and maven releases -->
-	<scm>
-		<connection>scm:git:git@github.com:chrisruffalo/ee-config.git</connection>
-		<url>scm:git:git@github.com:chrisruffalo/ee-config.git</url>
-		<developerConnection>scm:git:git@github.com:chrisruffalo/ee-config.git</developerConnection>
-	</scm>
+    <!-- licensing information -->
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
-	<!-- licensing information -->
-	<licenses>
-		<license>
-			<name>The Apache Software License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
+    <!-- manage dependency groups -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- weld -->
+            <dependency>
+                <groupId>org.jboss.weld</groupId>
+                <artifactId>weld-core-bom</artifactId>
+                <version>1.1.16.Final</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
 
-	<!-- manage dependency groups -->
-	<dependencyManagement>
-		<dependencies>
-			<!-- JEE6 -->
-			<dependency>
-				<groupId>org.jboss.spec</groupId>
-				<artifactId>jboss-javaee-6.0</artifactId>
-				<type>pom</type>
-				<version>${jee6.version}</version>
-				<scope>provided</scope>
-			</dependency>
+            <dependency>
+                <groupId>org.jboss.arquillian</groupId>
+                <artifactId>arquillian-bom</artifactId>
+                <scope>import</scope>
+                <type>pom</type>
+                <version>${arquillian.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
-			<dependency>
-				<groupId>org.jboss.arquillian</groupId>
-				<artifactId>arquillian-bom</artifactId>
-				<scope>import</scope>
-				<type>pom</type>
-				<version>${arquillian.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.jboss.arquillian.junit</groupId>
-				<artifactId>arquillian-junit-container</artifactId>
-				<version>${arquillian.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.jboss.arquillian.protocol</groupId>
-				<artifactId>arquillian-protocol-servlet</artifactId>
-				<version>${arquillian.version}</version>
-				<scope>test</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+    <!-- manage individual dependencies -->
+    <dependencies>
+        <!-- configuration -->
+        <dependency>
+            <groupId>commons-configuration</groupId>
+            <artifactId>commons-configuration</artifactId>
+            <version>${commons.configuration.version}</version>
+        </dependency>
+    
+        <!-- relevant CDI/weld bits -->
+        <dependency>
+            <groupId>org.jboss.weld</groupId>
+            <artifactId>weld-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.weld</groupId>
+            <artifactId>weld-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.web</groupId>
+            <artifactId>el-impl</artifactId>
+            <scope>runtime</scope>
+        </dependency>        
 
-	<!-- manage individual dependencies -->
-	<dependencies>
-		<!-- JEE6 -->
+        <!-- logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- only need this during testing -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.0.13</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- guava is used to make copying files easier during test -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- testing -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        
+        <!-- with arquillian -->
 		<dependency>
-			<groupId>org.jboss.spec</groupId>
-			<artifactId>jboss-javaee-6.0</artifactId>
-			<type>pom</type>
-			<exclusions>
-				<exclusion>
-					<artifactId>xalan</artifactId>
-					<groupId>xalan</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<!-- logging -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>1.0.13</version>
-			<scope>test</scope>
-		</dependency>
-		
-		<!-- configuration -->
-		<dependency>
-			<groupId>commons-configuration</groupId>
-			<artifactId>commons-configuration</artifactId>
-			<version>${commons.configuration.version}</version>
-		</dependency>
-		
-		<!-- guava is used to make copying files easier during test -->
-		<dependency>
-		    <groupId>com.google.guava</groupId>
-		    <artifactId>guava</artifactId>
-		    <version>${guava.version}</version>
+		    <groupId>org.jboss.arquillian.junit</groupId>
+		    <artifactId>arquillian-junit-container</artifactId>
 		    <scope>test</scope>
-		</dependency>
+		</dependency>        
+        <dependency>
+            <groupId>org.jboss.arquillian.container</groupId>
+            <artifactId>arquillian-weld-se-embedded-1.1</artifactId>
+            <version>1.0.0.CR7</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
-		<!-- testing -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>${junit.version}</version>
-			<scope>test</scope>
-		</dependency>
+    <build>
+        <!-- resource filtering -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                    <include>**/*.properties</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>**/*.xml</exclude>
+                    <exclude>**/*.properties</exclude>
+                </excludes>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
 
-		<!-- Arquillian -->
-		<dependency>
-			<groupId>org.jboss.arquillian.junit</groupId>
-			<artifactId>arquillian-junit-container</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.arquillian.protocol</groupId>
-			<artifactId>arquillian-protocol-servlet</artifactId>
-		</dependency>
-	</dependencies>
+        <!-- test resource filtering -->
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                    <include>**/*.properties</include>
+                </includes>
+                <filtering>true</filtering>
+            </testResource>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <excludes>
+                    <exclude>**/*.xml</exclude>
+                    <exclude>**/*.properties</exclude>
+                </excludes>
+                <filtering>false</filtering>
+            </testResource>
+        </testResources>
 
-	<build>
-		<!-- resource filtering -->
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<includes>
-					<include>**/*.xml</include>
-					<include>**/*.properties</include>
-				</includes>
-				<filtering>true</filtering>
-			</resource>
-			<resource>
-				<directory>src/main/resources</directory>
-				<excludes>
-					<exclude>**/*.xml</exclude>
-					<exclude>**/*.properties</exclude>
-				</excludes>
-				<filtering>false</filtering>
-			</resource>
-		</resources>
+        <plugins>
+            <!-- SCM Revision for use in build -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <version>1.1</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!-- use only the first 5 characters of the git revision -->
+                    <shortRevisionLength>5</shortRevisionLength>
+                    <getRevisionOnlyOnce>true</getRevisionOnlyOnce>
+                    <doCheck>false</doCheck>
+                    <doUpdate>false</doUpdate>
+                </configuration>
+            </plugin>
+        </plugins>
 
-		<!-- test resource filtering -->
-		<testResources>
-			<testResource>
-				<directory>src/test/resources</directory>
-				<includes>
-					<include>**/*.xml</include>
-					<include>**/*.properties</include>
-				</includes>
-				<filtering>true</filtering>
-			</testResource>
-			<testResource>
-				<directory>src/test/resources</directory>
-				<excludes>
-					<exclude>**/*.xml</exclude>
-					<exclude>**/*.properties</exclude>
-				</excludes>
-				<filtering>false</filtering>
-			</testResource>
-		</testResources>
+        <!-- manage default plugin behavior -->
+        <pluginManagement>
+            <plugins>
+                <!-- use java 6 through maven compiler 2.5 -->
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <verbose>true</verbose>
+                        <source>1.7</source>
+                        <target>1.7</target>
+                        <fork>true</fork>
+                        <compilerVersion>1.7</compilerVersion>
+                    </configuration>
+                </plugin>
+                
+                <!-- use modern maven release plugin -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>2.4</version>
+                </plugin>
+                
+                <!-- sync with eclipse (download code, etc) -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-eclipse-plugin</artifactId>
+                    <version>2.8</version>
+                    <configuration>
+                        <downloadSources>true</downloadSources>
+                        <downloadJavadocs>true</downloadJavadocs>
+                    </configuration>
+                </plugin>
 
-		<plugins>
-			<!-- SCM Revision for use in build -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>buildnumber-maven-plugin</artifactId>
-				<version>1.1</version>
-				<executions>
-					<execution>
-						<phase>validate</phase>
-						<goals>
-							<goal>create</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<!-- use only the first 5 characters of the git revision -->
-					<shortRevisionLength>5</shortRevisionLength>
-					<getRevisionOnlyOnce>true</getRevisionOnlyOnce>
-					<doCheck>false</doCheck>
-					<doUpdate>false</doUpdate>
-				</configuration>
-			</plugin>
-		</plugins>
-
-		<!-- manage default plugin behavior -->
-		<pluginManagement>
-			<plugins>
-				<!-- use java 6 through maven compiler 2.5 -->
-				<plugin>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<configuration>
-						<verbose>true</verbose>
-						<source>1.6</source>
-						<target>1.6</target>
-						<fork>true</fork>
-						<compilerVersion>1.6</compilerVersion>
-					</configuration>
-				</plugin>
-				
-				<!-- use modern maven release plugin -->
-		        <plugin>
-		            <groupId>org.apache.maven.plugins</groupId>
-		            <artifactId>maven-release-plugin</artifactId>
-		            <version>2.4</version>
-            	</plugin>
-				
-				<!-- sync with eclipse (download code, etc) -->
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-eclipse-plugin</artifactId>
-					<version>2.8</version>
-					<configuration>
-						<downloadSources>true</downloadSources>
-						<downloadJavadocs>true</downloadJavadocs>
-					</configuration>
-				</plugin>
-
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
-					only. It has no influence on the Maven build itself. -->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											org.apache.maven.plugins
-										</groupId>
-										<artifactId>
-											maven-dependency-plugin
-										</artifactId>
-										<versionRange>
-											[2.1,)
-										</versionRange>
-										<goals>
-											<goal>unpack</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore />
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
-
-	<profiles>
-		<!-- profile for arquillian test cases managed with this profile -->
-		<profile>
-			<id>arquillian-jboss-managed</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>org.jboss.as</groupId>
-					<artifactId>jboss-as-arquillian-container-managed</artifactId>
-					<version>${jboss-as.version}</version>
-					<scope>test</scope>
-				</dependency>
-			</dependencies>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>unpack</id>
-								<phase>process-test-classes</phase>
-								<goals>
-									<goal>unpack</goal>
-								</goals>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>org.jboss.as</groupId>
-											<artifactId>jboss-as-dist</artifactId>
-											<version>${jboss-as.version}</version>
-											<type>zip</type>
-											<overWrite>false</overWrite>
-											<outputDirectory>target</outputDirectory>
-										</artifactItem>
-									</artifactItems>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<version>2.12.3</version>
-						<configuration>
-							<systemPropertyVariables>
-								<arquillian.launch>jbossas-managed</arquillian.launch>
-							</systemPropertyVariables>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-		<!-- profile for signing release artifacts -->
-		<profile>
-			<id>release-sign-artifacts</id>
-			<activation>
-				<property>
-					<name>performRelease</name>
-					<value>true</value>
-				</property>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.1</version>
-						<executions>
-							<execution>
-								<id>sign-artifacts</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>		
-	</profiles>
+                <!--This plugin's configuration is used to store Eclipse m2e settings 
+                    only. It has no influence on the Maven build itself. -->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>
+                                            org.apache.maven.plugins
+                                        </groupId>
+                                        <artifactId>
+                                            maven-dependency-plugin
+                                        </artifactId>
+                                        <versionRange>
+                                            [2.1,)
+                                        </versionRange>
+                                        <goals>
+                                            <goal>unpack</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>

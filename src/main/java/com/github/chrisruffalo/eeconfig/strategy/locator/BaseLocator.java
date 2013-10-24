@@ -3,7 +3,7 @@ package com.github.chrisruffalo.eeconfig.strategy.locator;
 import com.github.chrisruffalo.eeconfig.annotations.Source;
 import com.github.chrisruffalo.eeconfig.strategy.property.PropertyResolver;
 
-public abstract class BaseLocator implements ISourceLocator {
+public abstract class BaseLocator implements Locator {
 
 	protected String resolve(Source source, PropertyResolver resolver) {
 		String path = source.value();

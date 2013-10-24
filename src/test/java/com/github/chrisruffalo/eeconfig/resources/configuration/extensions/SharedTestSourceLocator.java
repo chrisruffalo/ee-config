@@ -2,18 +2,14 @@ package com.github.chrisruffalo.eeconfig.resources.configuration.extensions;
 
 import javax.inject.Singleton;
 
-import com.github.chrisruffalo.eeconfig.annotations.Source;
 import com.github.chrisruffalo.eeconfig.source.ISource;
-import com.github.chrisruffalo.eeconfig.strategy.locator.ISourceLocator;
-import com.github.chrisruffalo.eeconfig.strategy.property.PropertyResolver;
+import com.github.chrisruffalo.eeconfig.strategy.locator.Locator;
 
 @Singleton
-public class SharedTestSourceLocator implements ISourceLocator {
+public class SharedTestSourceLocator implements Locator {
 
 	@Override
-	public ISource locate(Source source, PropertyResolver resolver) {
-		// do resolve
-		resolver.resolveProperties(source.value());
+	public ISource locate(String path) {
 		// return dummy source		
 		return new DummySource();
 	}

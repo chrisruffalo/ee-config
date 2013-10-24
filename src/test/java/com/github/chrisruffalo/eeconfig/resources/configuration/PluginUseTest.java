@@ -6,7 +6,7 @@ import javax.inject.Inject;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,8 +14,8 @@ import org.junit.runner.RunWith;
 import com.github.chrisruffalo.eeconfig.annotations.Configuration;
 import com.github.chrisruffalo.eeconfig.annotations.Source;
 import com.github.chrisruffalo.eeconfig.resources.configuration.extensions.DummySource;
-import com.github.chrisruffalo.eeconfig.resources.configuration.extensions.SharedTestSourceLocator;
 import com.github.chrisruffalo.eeconfig.resources.configuration.extensions.SharedTestPropertyResolver;
+import com.github.chrisruffalo.eeconfig.resources.configuration.extensions.SharedTestSourceLocator;
 import com.github.chrisruffalo.eeconfig.source.ISource;
 import com.github.chrisruffalo.eeconfig.support.DeploymentFactory;
 
@@ -26,9 +26,8 @@ public class PluginUseTest {
 	private SharedTestPropertyResolver resolver;
 	
 	@Deployment
-	public static WebArchive deployment() {
-		WebArchive archive = DeploymentFactory.createDeployment();
-
+	public static JavaArchive deployment() {
+		JavaArchive archive = DeploymentFactory.createDeployment();
 		return archive;
 	}
 	

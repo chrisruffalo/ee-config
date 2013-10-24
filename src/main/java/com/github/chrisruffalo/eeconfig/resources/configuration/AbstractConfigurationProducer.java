@@ -20,7 +20,7 @@ import com.github.chrisruffalo.eeconfig.annotations.Configuration;
 import com.github.chrisruffalo.eeconfig.annotations.Source;
 import com.github.chrisruffalo.eeconfig.source.ISource;
 import com.github.chrisruffalo.eeconfig.source.impl.UnfoundSource;
-import com.github.chrisruffalo.eeconfig.strategy.locator.ISourceLocator;
+import com.github.chrisruffalo.eeconfig.strategy.locator.Locator;
 import com.github.chrisruffalo.eeconfig.strategy.locator.NullLocator;
 import com.github.chrisruffalo.eeconfig.strategy.property.DefaultPropertyResolver;
 import com.github.chrisruffalo.eeconfig.strategy.property.PropertyResolver;
@@ -92,15 +92,6 @@ public abstract class AbstractConfigurationProducer {
 			}
 		}
 		
-		// handle special case where default source is found AND resolved
-		if(configuration.defaultSource() != null) {
-			Source defaultSource = configuration.defaultSource();
-			ISource foundDefault = this.resloveSource(defaultSource, resolver);
-			if(foundDefault != null && foundDefault.available()) {
-				foundSources.add(foundDefault);
-			}
-		}
-		
 		// fix no sources found, a source SHOULD always be returned
 		if(foundSources.isEmpty()) {
 			foundSources.add(new UnfoundSource());
@@ -110,14 +101,22 @@ public abstract class AbstractConfigurationProducer {
 	}
 	
 	private ISource resloveSource(Source source, PropertyResolver resolver) {
-		Class<? extends ISourceLocator> locatorClass = source.locator();
+		Class<? extends Locator> locatorClass = source.locator();
 		if(locatorClass == null) {
 			locatorClass = NullLocator.class;
 		}
-		ISourceLocator locator = this.resolveBeanWithDefaultClass(locatorClass, NullLocator.class);
+		Locator locator = this.resolveBeanWithDefaultClass(locatorClass, NullLocator.class);
 		this.logger.trace("Using locator: '{}'", locator.getClass().getName());
 		
-		ISource foundSource = locator.locate(source, resolver);
+		// resolve path if enabled
+		String path = source.value();
+		if(source.resolve()) {
+			path = resolver.resolveProperties(path);
+		}
+		
+		// locate
+		ISource foundSource = locator.locate(path);
+		
 		this.logger.trace("Found source: '{}' (using locator '{}')", foundSource, locator.getClass().getName());
 		return foundSource;
 	}

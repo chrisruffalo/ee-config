@@ -30,20 +30,14 @@ import com.github.chrisruffalo.eeconfig.strategy.property.PropertyResolver;
 public @interface Configuration {
 	
 	/**
-	 * List of configuration sources
+	 * List of configuration sources that should be used to create
+	 * the configuration instance.  The highest priority {@link Source}
+	 * is the first source.
 	 * 
 	 * @return a list of paths to search for the configuration file
 	 */
 	@Nonbinding
 	Source[] sources() default {};
-	
-	/**
-	 * Default configuration source
-	 * 
-	 * @return
-	 */
-	@Nonbinding
-	Source defaultSource() default @Source("");
 	
 	/**
 	 * If true it indicates that the files should be merged, in order 

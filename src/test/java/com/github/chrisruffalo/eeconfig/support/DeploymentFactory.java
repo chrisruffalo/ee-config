@@ -5,9 +5,7 @@ import java.util.Properties;
 import java.util.UUID;
 
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
-import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +18,7 @@ public final class DeploymentFactory {
 		
 	}
 	
-	public static WebArchive createDeployment() {
+	public static JavaArchive createDeployment() {
 		// create logger
 		Logger logger = LoggerFactory.getLogger(DeploymentFactory.class);
 		
@@ -33,28 +31,19 @@ public final class DeploymentFactory {
 		}
 		
 		// create archive
-		WebArchive archive = ShrinkWrap.create(WebArchive.class, "ee-config-test-" + UUID.randomUUID() + ".war");
+		JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "ee-config-test-" + UUID.randomUUID() + ".jar");
 		
 		// whole project
 		archive.addPackages(true, "com.github.chrisruffalo.eeconfig");
 		
 		// as a bean-enabled archive
-		archive.addAsWebInfResource("META-INF/beans.xml", "beans.xml");
+		archive.addAsResource("META-INF/beans.xml");
 		
 		// load libraries
-		MavenDependencyResolver resolver = DependencyResolvers.use(MavenDependencyResolver.class);
-		
-		// prevent from downloading additional resources
-		// not found in the local repo
-		resolver.configureFrom("pom.xml");
-		resolver.useCentralRepo(false);
-		resolver.goOffline();
-		
-		// load versions from properties file
-		String commonsConfigurationVersion = properties.getProperty("commons.configuration.version", "1.9");
-		
-		// commons-configuration and dependencies
-		archive.addAsLibraries(resolver.artifact("commons-configuration:commons-configuration:" + commonsConfigurationVersion).resolveAsFiles());
+		//File[] libs = Maven.resolver()  
+		//	    .loadPomFromFile("pom.xml")
+		//	    .resolve("commons-configuration:commons-configuration")
+		//	    .withTransitivity().asFile();
 		
 		// add resources
 		archive.addAsResource("properties/priority1.properties")
