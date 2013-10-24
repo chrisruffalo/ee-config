@@ -346,9 +346,13 @@ public class ConfigureMeWithCustomBehavior {
 	@Configuration(
 	    // main configuration
 		sources = {
-			@Source("@@jboss.server.config.dir@@/application/main.properties", resolve=true, locator=CustomLocator.class) 
+			@Source(
+			    "@@jboss.server.config.dir@@/application/main.properties", 
+			    resolve=true, 
+			    locator=CustomLocator.class
+			) 
 		},
-		resolver = com.example.CustomResolver.class // custom property resolver
+		resolver = com.example.CustomTokenResolver.class // custom property resolver
 	)
 	private Properties properties; 
 	
