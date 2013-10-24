@@ -183,6 +183,15 @@ public abstract class AbstractConfigurationProducer {
 		// copy each property annotation into the map for later use
 		Map<Object, Object> propertyMap = new HashMap<>(properties.length);
 		for(Property property : properties) {
+			// nulls and empty keys are bad
+			if(property.key() == null || property.key().isEmpty() || property.value() == null) {
+				continue;
+			}
+			// no dupes
+			if(propertyMap.containsKey(property.key())) {
+				continue;
+			}
+			// put in map
 			propertyMap.put(property.key(), property.value());
 		}		
 		return propertyMap;
