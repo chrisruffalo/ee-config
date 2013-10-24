@@ -16,10 +16,6 @@ import com.github.chrisruffalo.eeconfig.annotations.SystemProperty;
  */
 public class SystemPropertyProducer {
 
-	//@Inject
-	//@AutoLogger
-	//private Logger logger;
-
 	/**
 	 * Produces the System Property Specified by the Injection Point.
 	 * 

@@ -2,6 +2,12 @@ package com.github.chrisruffalo.eeconfig.source;
 
 import java.io.InputStream;
 
+/**
+ * Interface for a configuration source element
+ * 
+ * @author Chris Ruffalo
+ *
+ */
 public interface ISource {
 
 	/**

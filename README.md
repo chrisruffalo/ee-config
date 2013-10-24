@@ -11,7 +11,7 @@ So often, during the course of my work, I find that various projects have chosen
 
 About a year ago I was working on a project where I had to deploy 10 instances of an application each with a slightly different configuration.  This became massively irratating in light of the fact that there was no possibility for automated deployment and everything had to be done by hand.  Each application had to be deployed as an exploded WAR and each configuration file had to be edited.  This drove me *nuts*.
 
-When version 2.0 of the application came along we were very excited to move to EE6 and we had a bit of a revalation.  We can **inject** configuration elements.  We can leverage the container to provide us with paths to the application.  We can do a lot of groundwork to make it easier for developers to create "no-worry" configuration situations.
+When version 2.0 of the application came along we were very excited to move to EE6 and we had a bit of a revalation.  We can **inject** configuration elements.  We can leverage the container to provide us with paths to the application.  We can do a lot of groundwork to make it easier for developers to create "no-worry" configuration situations... but we had to design our own way.  EE-Config is an outgrowth of the lessons learned on that project.
 
 ## Requirements
 
@@ -29,7 +29,7 @@ Commons Configuration also provides one of the injectable configuration types to
 
 ## Building and Testing
 
-This application uses Maven to build.  It uses Arquillian for testing.  In order to test and build and install you should just execute the command 'mvn clean install' in the root of the project.  That's it!
+This application uses Maven to build.  It uses Arquillian (Weld SE) for testing.  In order to test and build and install you should just execute the command 'mvn clean install' in the root of the project.  That's it!
 
 ## Use
 
@@ -99,15 +99,16 @@ Configuration is tricky, so we've tried to make it easier.  Injecting the config
 
 * A *null object is never injected*.  There may be an empty property file or an empty input stream that is injected but it will **never** be null.
 * In the non-merge case the **first** configuration file found is used for the injection.
-* In the merge case the *first* configuration file has the highest prority, other found configuration files will have lower priority.
-* When injecting an InputStream or InputStreams the merge flag has no effect.
+* In the merge case the *first* configuration file has the highest priority, other found configuration files will have lower priority.
+* When injecting an InputStream, InputStreams, or raw ISources the merge flag has no effect.
 
 Keeping in mind those things it is important to realize, too, that the configuration injection will inject the following types:
 
 * java.util.Properties
 * org.apache.commons.configuration.Configuration
 * java.io.InputStream
-* java.util.List<java.io.InputStream>
+* java.util.List\<java.io.InputStream\>
+* java.util.List\<com.github.chrisruffalo.eeconfig.source.ISource\> (so called "raw" source injection)
 
 The Commons Configuraiton supports the following subtypes:
 
@@ -126,18 +127,20 @@ It might be nice if we just shut up and showed you how to use it.  Below you'll 
 public class ConfigureMeWithProperties {
 	@Inject
 	@Configuration(
-		paths = {
-			"${jboss.server.config.dir}/application/main.properties" // main configuration
-			"resource:default.properties" // will look on classpath for default properties
+		sources = {
+			@Source(
+			    value="${jboss.server.config.dir}/application/main.properties", // main configuration 
+			    resolve=true // resolves system properties for this source
+			),  
+			@Source(value="resource:default.properties") // will look on classpath for default properties
 		},
-		resolveSystemProperties = true, // resolves system properties in paths
 		merge = true // merges results
 	)
 	private Properties config; 
 	
 }
 ```
-The result of this annotation is that a java.util.Properties object will be injected and the contents of that injection will be first populated from the file found at "${jboss.server.config.dir}/application/main.properties" and then the classpath resource with the path "default.properties" will be loaded to provide the rest of the values.  The resolution is done in order.  The resolveSystemProperties flag must be set to 'true' in order to resolve the token '${jboss.server.config.dir}'.
+The result of this annotation is that a java.util.Properties object will be injected and the contents of that injection will be first populated from the file found at "${jboss.server.config.dir}/application/main.properties" and then the classpath resource with the path "default.properties" will be loaded to provide the rest of the values.  The resolution is done in order.  The resolve flag must be set to 'true' in order to resolve the token '${jboss.server.config.dir}'.
 
 If merge was not set or set to false then **only** the values of the first configuration file would be loaded.  Since the value is set to true each file that is found is merged with the others.  The first file that is found has the highest priority.
 
@@ -147,11 +150,10 @@ If merge was not set or set to false then **only** the values of the first confi
 public class ConfigureMeWithCommonConfiguration {
 	@Inject
 	@Configuration(
-		paths = {
-			"${jboss.server.config.dir}/application/main.properties" // main configuration
-			"resource:default.properties" // will look on classpath for default properties
+		sources = {
+			@Source("${jboss.server.config.dir}/application/main.properties", resolve=true), // main configuration
+			@Source("resource:default.properties") // will look on classpath for default properties
 		},
-		resolveSystemProperties = true, // resolves system properties in paths
 		merge = true // merges results
 	)
 	private org.apache.commons.configuration.Configuration config; 
@@ -168,11 +170,10 @@ Say that you *don't* need a fancy configuration object and you'd like to do some
 public class ConfigureMeAnInputStream {
 	@Inject
 	@Configuration(
-		paths = {
-			"${jboss.server.config.dir}/application/main.properties" // main configuration
-			"resource:default.properties" // will look on classpath for default properties
-		},
-		resolveSystemProperties = true, // resolves system properties in paths
+		sources = {
+			@Source("${jboss.server.config.dir}/application/main.properties", resolve=true), // main configuration
+			@Source("resource:default.properties") // will look on classpath for default properties
+		}
 	)
 	private InputStream configStream; 
 	
@@ -199,9 +200,9 @@ So, let's say you want to go one step farther and implement your own merge behav
 public class ConfigureMeAnInputStream {
 	@Inject
 	@Configuration(
-		paths = {
-			"${jboss.server.config.dir}/application/main.properties" // main configuration
-			"resource:default.properties" // will look on classpath for default properties
+		sources = {
+			@Source("${jboss.server.config.dir}/application/main.properties", resolve=true), // main configuration
+			@Source("resource:default.properties") // will look on classpath for default properties
 		},
 		resolveSystemProperties = true, // resolves system properties in paths
 	)
@@ -224,17 +225,16 @@ You should also note that the 'merge' flag has no effect in this injection conte
 
 #### Example 5: Raw Input Sources
 
-For something a little more advanced you can inject [IConfigurationSource](src/main/java/com/github/chrisruffalo/eeconfig/resources/configuration/source/IConfigurationSource.java) objects directly!  This gives fairly fine grained control over how the streams are loaded and handled.
+For something a little more advanced you can inject [ISource](src/main/java/com/github/chrisruffalo/eeconfig/source/ISource.java) objects directly!  This gives fairly fine grained control over how the streams are loaded and handled.
 
 ``` java
 public class ConfigureFromRawSources {
 	@Inject
 	@Configuration(
-		paths = {
-			"${jboss.server.config.dir}/application/main.properties" // main configuration
-			"resource:default.properties" // will look on classpath for default properties
-		},
-		resolveSystemProperties = true, // resolves system properties in paths
+		sources = {
+			@Source("${jboss.server.config.dir}/application/main.properties", resolve=true), // main configuration
+			@Source("resource:default.properties") // will look on classpath for default properties
+		}
 	)
 	private List<IConfigurationSource> configSources; 
 	
@@ -276,7 +276,7 @@ public class MyCustomConfigurationProducer extends AbstractConfigurationProducer
 		// this method will ALWAYS return a non-null list with AT LEAST ONE
 		// input source.  (The configuration source may have no content.)
 		// see IConfigurationSource for more details  
-		List<IConfigurationSource> sources = this.locate(annotation);		
+		List<ISource> sources = this.locate(annotation);		
 		
 		// implement custom logic to load the input stream here
 		MyCustomConfigurationType config = MyCustomConfigurationType.load(sources);
@@ -298,11 +298,17 @@ There are two extendable behaviors in EE-Config.  Each of these is governed by a
 
 ### Configuration source and resource location
 
-The [ConfigurationSourceLocator](src/main/java/com/github/chrisruffalo/eeconfig/strategy/locator/ConfigurationSourceLocator.java) is the interface for creating custom locators for the configuration sources.  The [default implementation](src/main/java/com/github/chrisruffalo/eeconfig/strategy/locator/DefaultConfigurationSourceLocator.java) is normally used for finding files and resources.
+The [Locator](src/main/java/com/github/chrisruffalo/eeconfig/strategy/locator/Locator.java) is the interface for creating custom locators for the configuration sources.
+
+The following implementations of Locator are provided by default
+
+* MultiLocator - locates ISource elements by looking at the file system and classpath, this is the default locator
+* FileLocator - locates files on the local filesystem
+* ResourceLocator - locates resources on the classpath
 
 ### Property token resolution
 
-A similar approach is taken with the [PropertyResolver](src/main/java/com/github/chrisruffalo/eeconfig/strategy/property/PropertyResolver.java).  There is also a [default implementation](src/main/java/com/github/chrisruffalo/eeconfig/strategy/property/DefaultPropertyResolver.java) that normally handles the resolution of properties within the resource paths.  This could be overriden to provide different token types or possibly even a pre-seeded property set.
+You can implement your own [PropertyResolver](src/main/java/com/github/chrisruffalo/eeconfig/strategy/property/PropertyResolver.java).  There is also a [default implementation](src/main/java/com/github/chrisruffalo/eeconfig/strategy/property/DefaultPropertyResolver.java) to handle the resolution of properties within the resource paths.  This could be overriden to provide different token types or possibly even a pre-seeded property set.
 
 ### Putting it to work
 

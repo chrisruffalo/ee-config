@@ -100,6 +100,13 @@ public abstract class AbstractConfigurationProducer {
 		return foundSources;
 	}
 	
+	/**
+	 * Resolve a given source from the provided {@link Source} annotation
+	 * 
+	 * @param source
+	 * @param resolver
+	 * @return
+	 */
 	private ISource resloveSource(Source source, PropertyResolver resolver) {
 		Class<? extends Locator> locatorClass = source.locator();
 		if(locatorClass == null) {

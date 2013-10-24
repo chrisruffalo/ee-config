@@ -5,19 +5,32 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Default;
-import javax.inject.Singleton;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Default implementation of the property resolver that can
+ * resolve properties by using a given property map combined
+ * with given System Properties
+ * 
+ * @author Chris Ruffalo
+ *
+ */
 @Default
-@Singleton
+@ApplicationScoped
 public class DefaultPropertyResolver implements PropertyResolver {
-
+	
+	// not injected so we can write some "normal" unit tests based around it
 	private Logger logger;
 
+	/**
+	 * Create the default resolver
+	 * 
+	 */
 	public DefaultPropertyResolver() {
 		this.logger = LoggerFactory.getLogger(this.getClass());
 	}

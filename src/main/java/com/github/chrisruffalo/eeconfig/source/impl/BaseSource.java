@@ -4,8 +4,15 @@ import java.io.InputStream;
 
 import com.github.chrisruffalo.eeconfig.source.ISource;
 
+/**
+ * Common implementation for sources
+ * 
+ * @author Chris Ruffalo
+ *
+ */
 public abstract class BaseSource implements ISource {
 
+	// the path to the source
 	private String path;
 	
 	/**
@@ -33,6 +40,11 @@ public abstract class BaseSource implements ISource {
 		return path;
 	}
 
+	/**
+	 * Set the path of the element
+	 * 
+	 * @param path
+	 */
 	public void setPath(String path) {
 		this.path = path;
 	}
@@ -52,6 +64,9 @@ public abstract class BaseSource implements ISource {
 		return ext;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String toString() {
 		return this.getClass().getSimpleName() + " [available: " + this.available() + "]";

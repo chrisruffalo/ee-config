@@ -32,6 +32,12 @@ public class InputStreamConfigurationProducer extends AbstractConfigurationProdu
 	@AutoLogger
 	private Logger logger;
 	
+	/**
+	 * Returns an input stream, the first one found, for a given {@link Configuration}
+	 * 
+	 * @param injectionPoint
+	 * @return
+	 */
 	@Produces
 	@Configuration
 	public InputStream getInputStream(InjectionPoint injectionPoint) {
@@ -41,7 +47,14 @@ public class InputStreamConfigurationProducer extends AbstractConfigurationProdu
 		// get input streams
 		List<ISource> sources = this.locate(annotation);
 		
-		// return the first stream
+		// return first available source
+		for(ISource source : sources) {
+			if(source.available()) {
+				return source.stream();
+			}
+		}
+		
+		// otherwise just return the first stream
 		return sources.get(0).stream();	
 	}
 	

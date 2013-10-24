@@ -3,7 +3,7 @@ package com.github.chrisruffalo.eeconfig.strategy.property;
 import java.util.Map;
 
 /**
- * Resolves property tokens inside of strings
+ * Interface for resolving property tokens inside of strings
  * 
  * @author Chris Ruffalo
  *

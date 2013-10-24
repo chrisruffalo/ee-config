@@ -18,10 +18,9 @@ import com.github.chrisruffalo.eeconfig.annotations.AutoLogger;
 public class LoggerProducer {
 
 	/**
-	 * Creates a Logger.
+	 * Creates a Logger with using the class name of the injection point.
 	 * 
-	 * @param injectionPoint
-	 *            Injection Point of the Injection.
+	 * @param injectionPoint Injection Point of the Injection.
 	 * @return Logger for the Class
 	 */
 	@Produces

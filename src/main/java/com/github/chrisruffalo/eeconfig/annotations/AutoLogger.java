@@ -12,7 +12,9 @@ import java.lang.annotation.Target;
 import javax.inject.Qualifier;
 
 /**
- * Used to qualify provided SLF4J logger
+ * Used to qualify provided SLF4J logger so that it will
+ * not collide with whatever logger might be provided
+ * by the hosting application.
  * 
  * @author Chris Ruffalo
  * 

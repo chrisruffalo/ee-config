@@ -8,9 +8,18 @@ import com.github.chrisruffalo.eeconfig.source.ISource;
 import com.github.chrisruffalo.eeconfig.source.impl.FileSource;
 import com.github.chrisruffalo.eeconfig.source.impl.UnfoundSource;
 
+/**
+ * Locate a file source from the path given
+ * 
+ * @author Chris Ruffalo
+ *
+ */
 @ApplicationScoped
 public class FileLocator extends BaseLocator {
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public ISource locate(String path) {
 		if(path == null || path.isEmpty()) {

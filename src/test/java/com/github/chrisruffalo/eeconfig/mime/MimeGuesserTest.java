@@ -4,9 +4,17 @@ package com.github.chrisruffalo.eeconfig.mime;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.github.chrisruffalo.eeconfig.source.ISource;
 import com.github.chrisruffalo.eeconfig.source.impl.ResourceSource;
 import com.github.chrisruffalo.eeconfig.source.impl.UnfoundSource;
 
+/**
+ * Test for 'guessing' MIME type of supported files against the
+ * various {@link ISource} types
+ * 
+ * @author Chris Ruffalo
+ *
+ */
 public class MimeGuesserTest {
 
 	@Test

@@ -9,6 +9,12 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Create and support deployments for Arquillian
+ * 
+ * @author Chris Ruffalo
+ *
+ */
 public final class DeploymentFactory {
 
 	/**
@@ -18,6 +24,11 @@ public final class DeploymentFactory {
 		
 	}
 	
+	/**
+	 * Create base JAR deployment for ee-config
+	 * 
+	 * @return
+	 */
 	public static JavaArchive createDeployment() {
 		// create logger
 		Logger logger = LoggerFactory.getLogger(DeploymentFactory.class);

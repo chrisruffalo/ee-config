@@ -119,7 +119,7 @@ public class CommonsConfigurationProducerTest {
 			@Configuration(
 				sources={
 					@Source(value="no/path/here.properties", locator=ResourceLocator.class),
-					@Source(value="/bad/path/file.properties", locator=ResourceLocator.class)
+					@Source(value="resource:/bad/path/file.properties")
 				}
 			) 
 			org.apache.commons.configuration.Configuration properties
@@ -139,9 +139,9 @@ public class CommonsConfigurationProducerTest {
 	public void testNoMergeResources(			
 		@Configuration(
 			sources={
-				@Source(value="properties/priority1.properties", locator=ResourceLocator.class),
-				@Source(value="properties/priority2.properties", locator=ResourceLocator.class),
-				@Source(value="properties/priority3.properties", locator=ResourceLocator.class),
+				@Source(value="resource:properties/priority1.properties"),
+				@Source(value="resource:properties/priority2.properties"),
+				@Source(value="resource:properties/priority3.properties"),
 			}
 		) 
 		org.apache.commons.configuration.Configuration properties) 
@@ -171,9 +171,9 @@ public class CommonsConfigurationProducerTest {
 	public void testNoMergeResourcesWithDifferentOrder(			
 		@Configuration(
 			sources={
-				@Source(value="properties/priority2.properties", locator=ResourceLocator.class),
-				@Source(value="properties/priority1.properties", locator=ResourceLocator.class),
-				@Source(value="properties/priority3.properties", locator=ResourceLocator.class),
+				@Source(value="resource:properties/priority2.properties"),
+				@Source(value="resource:properties/priority1.properties"),
+				@Source(value="resource:properties/priority3.properties"),
 			}
 		) 
 		org.apache.commons.configuration.Configuration properties) 
@@ -199,9 +199,9 @@ public class CommonsConfigurationProducerTest {
 	public void testMergedResources(		
 		@Configuration(
 			sources = {
-				@Source(value="properties/priority1.properties", locator=ResourceLocator.class),
-				@Source(value="properties/priority2.properties", locator=ResourceLocator.class),
-				@Source(value="properties/priority3.properties", locator=ResourceLocator.class),
+				@Source(value="resource:properties/priority1.properties"),
+				@Source(value="resource:properties/priority2.properties"),
+				@Source(value="resource:properties/priority3.properties"),
 			},
 			merge = true
 		) 
@@ -237,7 +237,7 @@ public class CommonsConfigurationProducerTest {
 			sources = {
 				@Source(value="${java.io.tmpdir}/priority2.properties", resolve=true),
 				@Source(value="${java.io.tmpdir}/priority1.properties", resolve=true),
-				@Source(value="properties/priority3.properties", locator=ResourceLocator.class),
+				@Source(value="resource:properties/priority3.properties"),
 			},
 			merge = true
 		) 

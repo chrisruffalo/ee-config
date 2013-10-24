@@ -37,12 +37,29 @@ public class CommonsConfigurationProducer extends AbstractConfigurationProducer 
 	@AutoLogger
 	private Logger logger;
 	
+	/**
+	 * Given the injection point, resolve an instance of Apache Commons Configuration
+	 * 
+	 * @param injectionPoint
+	 * @return
+	 */
 	@Produces
 	@Configuration
 	public org.apache.commons.configuration.Configuration getConfiguration(InjectionPoint injectionPoint) {
 		// get configuration annotation
 		Configuration annotation = this.getAnnotation(injectionPoint);
-		
+		// use shared implementation to get configuration
+		return this.getConfiguration(annotation);
+	}
+	
+	/**
+	 * Shared implementation that is used to bootstrap other configurations if
+	 * requested.
+	 * 
+	 * @param annotation the annotation to use for configuring
+	 * @return the common configuration values
+	 */
+	public org.apache.commons.configuration.Configuration getConfiguration(Configuration annotation) {
 		// get input streams
 		List<ISource> sources = this.locate(annotation);
 		
@@ -98,5 +115,4 @@ public class CommonsConfigurationProducer extends AbstractConfigurationProducer 
 		// return configuration
 		return combined;
 	}
-	
 }
