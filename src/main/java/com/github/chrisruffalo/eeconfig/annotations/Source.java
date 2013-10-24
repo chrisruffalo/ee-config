@@ -9,7 +9,6 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Target;
 
 import javax.enterprise.util.Nonbinding;
-import javax.inject.Qualifier;
 
 import com.github.chrisruffalo.eeconfig.strategy.locator.Locator;
 import com.github.chrisruffalo.eeconfig.strategy.locator.MultiLocator;
@@ -27,7 +26,6 @@ import com.github.chrisruffalo.eeconfig.strategy.locator.MultiLocator;
  *
  */
 @Inherited
-@Qualifier
 @Target({ METHOD, FIELD, PARAMETER, TYPE })
 public @interface Source {
 

@@ -47,7 +47,15 @@ public class DefaultPropertyResolver implements PropertyResolver {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String resolveProperties(String fullString, Map<String, String> additionalProperties) {
+	public String resolveProperties(String fullString, Map<String, String> bootstrapProperties) {
+		return resolveProperties(fullString, bootstrapProperties, new HashMap<String, String>(0));
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String resolveProperties(String fullString, Map<String, String> bootstrapProperties, Map<String, String> defaultProperties) {
 		
 		// prevent loops
 		Set<String> previousValues = new HashSet<String>();
@@ -80,12 +88,14 @@ public class DefaultPropertyResolver implements PropertyResolver {
 					continue;
 				}
 	
-				// get the property
-				final String property;
-				if(additionalProperties != null && additionalProperties.containsKey(token)) {
-					property = additionalProperties.get(token);
-				} else {
+				// get the property (first from bootstrap, then from system properties, then from default)
+				String property = null;
+				if(bootstrapProperties != null && bootstrapProperties.containsKey(token)) {
+					property = bootstrapProperties.get(token);
+				} else if(System.getProperties().containsKey(token)) {
 					property = System.getProperty(token);
+				} else if(defaultProperties != null && defaultProperties.containsKey(token)) {
+					property = defaultProperties.get(token);
 				}
 	
 				// if the property is null, leave

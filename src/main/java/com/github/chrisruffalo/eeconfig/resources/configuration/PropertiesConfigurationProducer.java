@@ -20,6 +20,7 @@ import com.github.chrisruffalo.eeconfig.annotations.Configuration;
 import com.github.chrisruffalo.eeconfig.mime.MimeGuesser;
 import com.github.chrisruffalo.eeconfig.mime.SupportedType;
 import com.github.chrisruffalo.eeconfig.source.ISource;
+import com.github.chrisruffalo.eeconfig.wrapper.ConfigurationWrapper;
 
 /**
  * Resolves the {@link Configuration} annotation for injection
@@ -50,7 +51,7 @@ public class PropertiesConfigurationProducer extends AbstractConfigurationProduc
 		Properties properties = new Properties();
 		
 		// locate configurations
-		Configuration configuration = this.getAnnotation(injectionPoint);
+		ConfigurationWrapper configuration = this.getConfigurationWrapper(injectionPoint);
 		List<ISource> found = this.locate(configuration);
 		
 		// input stream list is immutable, copy so we can reverse

@@ -4,7 +4,10 @@ package com.github.chrisruffalo.eeconfig.resources.configuration;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.enterprise.context.spi.CreationalContext;
@@ -17,6 +20,8 @@ import org.slf4j.Logger;
 
 import com.github.chrisruffalo.eeconfig.annotations.AutoLogger;
 import com.github.chrisruffalo.eeconfig.annotations.Configuration;
+import com.github.chrisruffalo.eeconfig.annotations.Property;
+import com.github.chrisruffalo.eeconfig.annotations.Resolver;
 import com.github.chrisruffalo.eeconfig.annotations.Source;
 import com.github.chrisruffalo.eeconfig.source.ISource;
 import com.github.chrisruffalo.eeconfig.source.impl.UnfoundSource;
@@ -24,6 +29,9 @@ import com.github.chrisruffalo.eeconfig.strategy.locator.Locator;
 import com.github.chrisruffalo.eeconfig.strategy.locator.NullLocator;
 import com.github.chrisruffalo.eeconfig.strategy.property.DefaultPropertyResolver;
 import com.github.chrisruffalo.eeconfig.strategy.property.PropertyResolver;
+import com.github.chrisruffalo.eeconfig.wrapper.ConfigurationWrapper;
+import com.github.chrisruffalo.eeconfig.wrapper.ConfigurationWrapperFactory;
+import com.github.chrisruffalo.eeconfig.wrapper.ResolverWrapper;
 
 /**
  * Implements shared logic for loading configuration files
@@ -49,9 +57,9 @@ public abstract class AbstractConfigurationProducer {
 	 * 
 	 * @return configuration annotation
 	 */
-	protected Configuration getAnnotation(InjectionPoint injectionPoint) {
+	protected ConfigurationWrapper getConfigurationWrapper(InjectionPoint injectionPoint) {
 		Configuration configuration = injectionPoint.getAnnotated().getAnnotation(Configuration.class);
-		return configuration;
+		return ConfigurationWrapperFactory.wrap(configuration);
 	}
 	
 	/**
@@ -62,21 +70,17 @@ public abstract class AbstractConfigurationProducer {
 	 * 
 	 * @return List of InputStreams representing the configuration found
 	 */
-	protected List<ISource> locate(Configuration configuration) {
+	protected List<ISource> locate(ConfigurationWrapper configuration) {
 				
 		if(configuration == null) {
 			throw new IllegalArgumentException("A non-null Configuration annotation must be provided");
 		}
 		
-		PropertyResolver resolver = null;
-		Class<? extends PropertyResolver> propertyResolverClass = configuration.resolver();
-		if(propertyResolverClass == null) {
-			this.logger.debug("No alternate property resolver provided, using default");
-			propertyResolverClass = DefaultPropertyResolver.class;
-		} else {
-			this.logger.debug("Requesting alternate property resolver: {}", propertyResolverClass.getName());
-		}
-		resolver = this.resolveBeanWithDefaultClass(propertyResolverClass, DefaultPropertyResolver.class);
+		// create resolver from configuration annotation's resolver element
+		ResolverWrapper resolverWrapper = configuration.resolver();
+		PropertyResolver resolver = this.createPropertyResolver(resolverWrapper);
+		Map<String,String> bootstrapMap = this.getBootstrapProperties(resolverWrapper);
+		Map<String,String> defaultMap = this.getDefaultProperties(resolverWrapper);
 		
 		// found sources
 		List<ISource> foundSources = new ArrayList<ISource>(0);
@@ -86,7 +90,7 @@ public abstract class AbstractConfigurationProducer {
 		
 		// resolve sources as normal
 		for(Source source : sources) {
-			ISource found = this.resloveSource(source, resolver);
+			ISource found = this.resloveSource(source, resolver, bootstrapMap, defaultMap);
 			if(found != null) {
 				foundSources.add(found);
 			}
@@ -101,13 +105,71 @@ public abstract class AbstractConfigurationProducer {
 	}
 	
 	/**
+	 * Resolve the property resolver instance to use from the {@link Resolver} 
+	 * annotation in the configuration element
+	 * 
+	 * @param resolverAnnotation
+	 * @return
+	 */
+	private PropertyResolver createPropertyResolver(ResolverWrapper resolverAnnotation) {
+		PropertyResolver resolver = null;
+		
+		// use the impl class to get the property resolver
+		Class<? extends PropertyResolver> propertyResolverClass = resolverAnnotation.impl();
+		if(propertyResolverClass == null) {
+			this.logger.debug("No alternate property resolver provided, using default");
+			propertyResolverClass = DefaultPropertyResolver.class;
+		} else {
+			this.logger.debug("Requesting alternate property resolver: {}", propertyResolverClass.getName());
+		}
+		resolver = this.resolveBeanWithDefaultClass(propertyResolverClass, DefaultPropertyResolver.class);
+		
+		return resolver;
+	}
+	
+	/**
+	 * Get the properties used to bootstrap the resolver
+	 * 
+	 * @param resolver
+	 * @return
+	 */
+	private Map<String, String> getBootstrapProperties(ResolverWrapper resolver) {
+		return Collections.emptyMap();
+	}
+	
+	/**
+	 * Get the properties that should be used as defaults when no other
+	 * properties are found for that value
+	 * 
+	 * @param resolver
+	 * @return
+	 */
+	private Map<String, String> getDefaultProperties(ResolverWrapper resolver) {
+		// if no resolver is given or the list of default properties is empty then 
+		// return an empty map
+		if(resolver == null || resolver.properties() == null || resolver.properties().length == 0) {
+			return Collections.emptyMap();
+		}
+		
+		// get properties from the resolver annotation
+		Property[] properties = resolver.properties();
+		
+		// copy each property annotation into the map for later use
+		Map<String, String> propertyMap = new HashMap<>(properties.length);
+		for(Property property : properties) {
+			propertyMap.put(property.key(), property.value());
+		}		
+		return propertyMap;
+	}
+	
+	/**
 	 * Resolve a given source from the provided {@link Source} annotation
 	 * 
 	 * @param source
 	 * @param resolver
 	 * @return
 	 */
-	private ISource resloveSource(Source source, PropertyResolver resolver) {
+	private ISource resloveSource(Source source, PropertyResolver resolver, Map<String, String> bootstrapMap, Map<String, String> defaultMap) {
 		Class<? extends Locator> locatorClass = source.locator();
 		if(locatorClass == null) {
 			locatorClass = NullLocator.class;
@@ -117,8 +179,8 @@ public abstract class AbstractConfigurationProducer {
 		
 		// resolve path if enabled
 		String path = source.value();
-		if(source.resolve()) {
-			path = resolver.resolveProperties(path);
+		if(resolver != null && source.resolve()) {
+			path = resolver.resolveProperties(path, bootstrapMap, defaultMap);
 		}
 		
 		// locate

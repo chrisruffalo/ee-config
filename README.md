@@ -352,7 +352,10 @@ public class ConfigureMeWithCustomBehavior {
 			    locator=CustomLocator.class
 			) 
 		},
-		resolver = com.example.CustomTokenResolver.class // custom property resolver
+		// specify custom property resolver
+		resolver = @Resolver(
+		  impl=com.example.CustomTokenResolver.class
+		)
 	)
 	private Properties properties; 
 	

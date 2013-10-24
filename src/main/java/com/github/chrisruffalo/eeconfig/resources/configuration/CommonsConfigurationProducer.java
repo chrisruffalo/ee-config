@@ -22,6 +22,7 @@ import com.github.chrisruffalo.eeconfig.annotations.Configuration;
 import com.github.chrisruffalo.eeconfig.mime.MimeGuesser;
 import com.github.chrisruffalo.eeconfig.mime.SupportedType;
 import com.github.chrisruffalo.eeconfig.source.ISource;
+import com.github.chrisruffalo.eeconfig.wrapper.ConfigurationWrapper;
 
 /**
  * Provides configuration injections to satisfy injection points for various
@@ -47,7 +48,7 @@ public class CommonsConfigurationProducer extends AbstractConfigurationProducer 
 	@Configuration
 	public org.apache.commons.configuration.Configuration getConfiguration(InjectionPoint injectionPoint) {
 		// get configuration annotation
-		Configuration annotation = this.getAnnotation(injectionPoint);
+		ConfigurationWrapper annotation = this.getConfigurationWrapper(injectionPoint);
 		// use shared implementation to get configuration
 		return this.getConfiguration(annotation);
 	}
@@ -56,12 +57,12 @@ public class CommonsConfigurationProducer extends AbstractConfigurationProducer 
 	 * Shared implementation that is used to bootstrap other configurations if
 	 * requested.
 	 * 
-	 * @param annotation the annotation to use for configuring
+	 * @param wrapper the annotation to use for configuring
 	 * @return the common configuration values
 	 */
-	public org.apache.commons.configuration.Configuration getConfiguration(Configuration annotation) {
+	public org.apache.commons.configuration.Configuration getConfiguration(ConfigurationWrapper wrapper) {
 		// get input streams
-		List<ISource> sources = this.locate(annotation);
+		List<ISource> sources = this.locate(wrapper);
 		
 		// create configuration combiner
 		OverrideCombiner combiner = new OverrideCombiner();
@@ -108,7 +109,7 @@ public class CommonsConfigurationProducer extends AbstractConfigurationProducer 
 			}
 			
 			// leave on first loop if merge is on
-			if(!annotation.merge()) {
+			if(!wrapper.merge()) {
 				break;
 			}
 		}		

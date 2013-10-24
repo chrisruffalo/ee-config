@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import com.github.chrisruffalo.eeconfig.annotations.AutoLogger;
 import com.github.chrisruffalo.eeconfig.annotations.Configuration;
 import com.github.chrisruffalo.eeconfig.source.ISource;
+import com.github.chrisruffalo.eeconfig.wrapper.ConfigurationWrapper;
 
 /**
  * Produces raw InputStreams for implementing custom configuration
@@ -41,11 +42,11 @@ public class InputStreamConfigurationProducer extends AbstractConfigurationProdu
 	@Produces
 	@Configuration
 	public InputStream getInputStream(InjectionPoint injectionPoint) {
-		// get configuration annotation
-		Configuration annotation = this.getAnnotation(injectionPoint);
+		// get configuration instance
+		ConfigurationWrapper wrapper = this.getConfigurationWrapper(injectionPoint);
 		
 		// get input streams
-		List<ISource> sources = this.locate(annotation);
+		List<ISource> sources = this.locate(wrapper);
 		
 		// return first available source
 		for(ISource source : sources) {
@@ -61,11 +62,11 @@ public class InputStreamConfigurationProducer extends AbstractConfigurationProdu
 	@Produces
 	@Configuration
 	public List<InputStream> getInputStreams(InjectionPoint injectionPoint) {
-		// get configuration annotation
-		Configuration annotation = this.getAnnotation(injectionPoint);
+		// get configuration instance
+		ConfigurationWrapper wrapper = this.getConfigurationWrapper(injectionPoint);
 		
-		// get sources
-		List<ISource> sources = this.locate(annotation);
+		// get input streams
+		List<ISource> sources = this.locate(wrapper);
 		
 		// get input streams
 		List<InputStream> streams = new ArrayList<InputStream>(sources.size());

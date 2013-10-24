@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.github.chrisruffalo.eeconfig.annotations.Configuration;
+import com.github.chrisruffalo.eeconfig.annotations.Resolver;
 import com.github.chrisruffalo.eeconfig.annotations.Source;
 import com.github.chrisruffalo.eeconfig.resources.configuration.extensions.DummySource;
 import com.github.chrisruffalo.eeconfig.resources.configuration.extensions.SharedTestPropertyResolver;
@@ -43,7 +44,7 @@ public class PluginUseTest {
 			@Source(value="${java.io.tmpdir}/priority2.properties", resolve=true),
 			@Source(value="${java.io.tmpdir}/priority1.properties", resolve=true),
 		},
-		resolver = SharedTestPropertyResolver.class
+		resolver = @Resolver(impl=SharedTestPropertyResolver.class)
 	) List<ISource> sources) {
 		// shared resolver has been called some number of times
 		Assert.assertTrue(this.resolver.getCount() > 0);
@@ -61,7 +62,7 @@ public class PluginUseTest {
 			@Source(value="${java.io.tmpdir}/priority2.properties", resolve=true),
 			@Source(value="${java.io.tmpdir}/priority1.properties", resolve=false),
 		},
-		resolver = SharedTestPropertyResolver.class
+		resolver = @Resolver(impl=SharedTestPropertyResolver.class)
 	) List<ISource> sources) {
 		// shared resolver has been called some number of times
 		Assert.assertTrue(this.resolver.getCount() > 0);

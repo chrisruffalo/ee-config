@@ -6,17 +6,32 @@ import javax.inject.Singleton;
 
 import com.github.chrisruffalo.eeconfig.strategy.property.DefaultPropertyResolver;
 
+/**
+ * Test resolver implementation
+ * 
+ * @author Chris Ruffalo
+ *
+ */
 @Singleton
 public class SharedTestPropertyResolver extends DefaultPropertyResolver {
 
+	// local count storage
 	private int count;
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public String resolveProperties(String fullString, Map<String, String> additionalProperties) {
+	public String resolveProperties(String fullString, Map<String, String> bootstrapProperties, Map<String, String> defaultProperties) {
 		this.count++;
-		return super.resolveProperties(fullString, additionalProperties);
+		return super.resolveProperties(fullString, bootstrapProperties, defaultProperties);
 	}
 
+	/**
+	 * Count number of resolutions for testing purposes
+	 * 
+	 * @return
+	 */
 	public int getCount() {
 		return this.count;
 	}

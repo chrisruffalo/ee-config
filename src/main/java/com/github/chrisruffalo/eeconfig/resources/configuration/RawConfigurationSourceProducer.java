@@ -8,6 +8,7 @@ import javax.enterprise.inject.spi.InjectionPoint;
 
 import com.github.chrisruffalo.eeconfig.annotations.Configuration;
 import com.github.chrisruffalo.eeconfig.source.ISource;
+import com.github.chrisruffalo.eeconfig.wrapper.ConfigurationWrapper;
 
 
 /**
@@ -30,11 +31,11 @@ public class RawConfigurationSourceProducer extends AbstractConfigurationProduce
 	@Produces
 	@Configuration
 	public List<ISource> getProperties(InjectionPoint injectionPoint) {
-		// get configuration annotation
-		Configuration annotation = this.getAnnotation(injectionPoint);
+		// get configuration instance
+		ConfigurationWrapper wrapper = this.getConfigurationWrapper(injectionPoint);
 		
 		// get input streams
-		List<ISource> sources = this.locate(annotation);
+		List<ISource> sources = this.locate(wrapper);
 		
 		return sources;
 	}	

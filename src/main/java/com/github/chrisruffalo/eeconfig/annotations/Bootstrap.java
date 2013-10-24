@@ -14,8 +14,13 @@ import javax.enterprise.util.Nonbinding;
 import javax.inject.Qualifier;
 
 /**
- * Annotation for specifying configuration file that
- * should be loaded.
+ * Annotation for specifying bootstraping configuration
+ * of a resolver. (This is almost literally just a copy of
+ * the configuration annotation to prevent cyclic
+ * references in the annotation structure.)
+ * <br/>
+ * Note: a bootstrap element cannot specify as many 
+ * details about a resolver. 
  *  
  * @author Chris Ruffalo
  * 
@@ -24,7 +29,7 @@ import javax.inject.Qualifier;
 @Qualifier
 @Retention(RUNTIME)
 @Target({ METHOD, FIELD, PARAMETER, TYPE })
-public @interface Configuration {
+public @interface Bootstrap {
 	
 	/**
 	 * List of configuration sources that should be used to create
@@ -57,5 +62,5 @@ public @interface Configuration {
 	 * @return the class that implements the property resolver behavior
 	 */
 	@Nonbinding
-	Resolver resolver() default @Resolver();
+	BootstrapResolver resolver() default @BootstrapResolver();
 }
