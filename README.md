@@ -154,7 +154,10 @@ public class ConfigureMeWithCommonConfiguration {
 	@Configuration(
 		sources = {
 		    // main configuration
-			@Source("${jboss.server.config.dir}/application/main.properties", resolve=true),
+			@Source(
+                "${jboss.server.config.dir}/application/main.properties", 
+                resolve=true
+            ),
 			// will look on classpath for default properties 
 			@Source("resource:default.properties")
 		},
@@ -175,8 +178,11 @@ public class ConfigureMeAnInputStream {
 	@Inject
 	@Configuration(
 		sources = {
-		    // main configuration
-			@Source("${jboss.server.config.dir}/application/main.properties", resolve=true),
+			// main configuration
+            @Source(
+                "${jboss.server.config.dir}/application/main.properties", 
+                resolve=true
+            ),
 			// will look on classpath for default properties 
 			@Source("resource:default.properties") 
 		}
@@ -203,16 +209,18 @@ In this case you'll need to take an extra step to get your configuration file by
 So, let's say you want to go one step farther and implement your own merge behavior.  Sure, you can do that... just inject a List of InputStream objects.
 
 ``` java
-public class ConfigureMeAnInputStream {
+public class ConfigureMeAnInputStreamList {
 	@Inject
 	@Configuration(
 		sources = {
 		    // main configuration
-			@Source("${jboss.server.config.dir}/application/main.properties", resolve=true), 
+			@Source(
+			    "${jboss.server.config.dir}/application/main.properties", 
+			    resolve=true
+			),
 			// will look on classpath for default properties
 			@Source("resource:default.properties") 
-		},
-		resolveSystemProperties = true, // resolves system properties in paths
+		}
 	)
 	private List<InputStream> configStreams; 
 	
@@ -241,7 +249,10 @@ public class ConfigureFromRawSources {
 	@Configuration(
 		sources = {
 		    // main configuration
-			@Source("${jboss.server.config.dir}/application/main.properties", resolve=true), 
+			@Source(
+                "${jboss.server.config.dir}/application/main.properties", 
+                resolve=true
+            ), 
 			// will look on classpath for default properties
 			@Source("resource:default.properties")
 		}
