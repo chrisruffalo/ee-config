@@ -1,6 +1,6 @@
 package com.github.chrisruffalo.eeconfig.strategy.property;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -40,22 +40,22 @@ public class DefaultPropertyResolver implements PropertyResolver {
 	 */
 	@Override
 	public String resolveProperties(String fullString) {
-		return resolveProperties(fullString, new HashMap<String, String>(0));
+		return resolveProperties(fullString, Collections.emptyMap());
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String resolveProperties(String fullString, Map<String, String> bootstrapProperties) {
-		return resolveProperties(fullString, bootstrapProperties, new HashMap<String, String>(0));
+	public String resolveProperties(String fullString, Map<Object, Object> bootstrapProperties) {
+		return resolveProperties(fullString, bootstrapProperties, Collections.emptyMap());
 	}
 	
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String resolveProperties(String fullString, Map<String, String> bootstrapProperties, Map<String, String> defaultProperties) {
+	public String resolveProperties(String fullString, Map<Object, Object> bootstrapProperties, Map<Object, Object> defaultProperties) {
 		
 		// prevent loops
 		Set<String> previousValues = new HashSet<String>();
@@ -91,11 +91,11 @@ public class DefaultPropertyResolver implements PropertyResolver {
 				// get the property (first from bootstrap, then from system properties, then from default)
 				String property = null;
 				if(bootstrapProperties != null && bootstrapProperties.containsKey(token)) {
-					property = bootstrapProperties.get(token);
+					property = String.valueOf(bootstrapProperties.get(token));
 				} else if(System.getProperties().containsKey(token)) {
 					property = System.getProperty(token);
 				} else if(defaultProperties != null && defaultProperties.containsKey(token)) {
-					property = defaultProperties.get(token);
+					property = String.valueOf(defaultProperties.get(token));
 				}
 	
 				// if the property is null, leave

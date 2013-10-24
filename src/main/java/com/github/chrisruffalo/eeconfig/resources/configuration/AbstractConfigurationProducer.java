@@ -11,11 +11,13 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
 
+import org.apache.commons.configuration.ConfigurationMap;
 import org.slf4j.Logger;
 
 import com.github.chrisruffalo.eeconfig.annotations.AutoLogger;
@@ -44,6 +46,9 @@ public abstract class AbstractConfigurationProducer {
 	@Inject
 	@AutoLogger
 	private Logger logger;
+	
+	@Inject
+	private Instance<CommonsConfigurationProducer> producer;
 	
 	@Inject
 	private BeanManager manager;
@@ -79,8 +84,8 @@ public abstract class AbstractConfigurationProducer {
 		// create resolver from configuration annotation's resolver element
 		ResolverWrapper resolverWrapper = configuration.resolver();
 		PropertyResolver resolver = this.createPropertyResolver(resolverWrapper);
-		Map<String,String> bootstrapMap = this.getBootstrapProperties(resolverWrapper);
-		Map<String,String> defaultMap = this.getDefaultProperties(resolverWrapper);
+		Map<Object,Object> bootstrapMap = this.getBootstrapProperties(resolverWrapper);
+		Map<Object,Object> defaultMap = this.getDefaultProperties(resolverWrapper);
 		
 		// found sources
 		List<ISource> foundSources = new ArrayList<ISource>(0);
@@ -133,8 +138,29 @@ public abstract class AbstractConfigurationProducer {
 	 * @param resolver
 	 * @return
 	 */
-	private Map<String, String> getBootstrapProperties(ResolverWrapper resolver) {
-		return Collections.emptyMap();
+	private Map<Object, Object> getBootstrapProperties(ResolverWrapper resolver) {
+		// return empty map
+		if(resolver.bootstrap() == null) {
+			return Collections.emptyMap();	
+		}
+		
+		// get configuration wrapper
+		ConfigurationWrapper wrapper = ConfigurationWrapperFactory.wrap(resolver.bootstrap());
+		
+		// bail early if nothing to do
+		if(wrapper.sources() == null || wrapper.sources().length == 0) {
+			return Collections.emptyMap();
+		}
+		
+		// obtain instance of CommonsConfiguration provider
+		CommonsConfigurationProducer instance = this.producer.get();
+		
+		// get commons configuration object from bootstrap
+		org.apache.commons.configuration.Configuration config = instance.getConfiguration(wrapper);
+		
+		// wrap as map and return
+		ConfigurationMap map = new ConfigurationMap(config);
+		return map;
 	}
 	
 	/**
@@ -144,7 +170,7 @@ public abstract class AbstractConfigurationProducer {
 	 * @param resolver
 	 * @return
 	 */
-	private Map<String, String> getDefaultProperties(ResolverWrapper resolver) {
+	private Map<Object, Object> getDefaultProperties(ResolverWrapper resolver) {
 		// if no resolver is given or the list of default properties is empty then 
 		// return an empty map
 		if(resolver == null || resolver.properties() == null || resolver.properties().length == 0) {
@@ -155,7 +181,7 @@ public abstract class AbstractConfigurationProducer {
 		Property[] properties = resolver.properties();
 		
 		// copy each property annotation into the map for later use
-		Map<String, String> propertyMap = new HashMap<>(properties.length);
+		Map<Object, Object> propertyMap = new HashMap<>(properties.length);
 		for(Property property : properties) {
 			propertyMap.put(property.key(), property.value());
 		}		
@@ -169,7 +195,7 @@ public abstract class AbstractConfigurationProducer {
 	 * @param resolver
 	 * @return
 	 */
-	private ISource resloveSource(Source source, PropertyResolver resolver, Map<String, String> bootstrapMap, Map<String, String> defaultMap) {
+	private ISource resloveSource(Source source, PropertyResolver resolver, Map<Object, Object> bootstrapMap, Map<Object, Object> defaultMap) {
 		Class<? extends Locator> locatorClass = source.locator();
 		if(locatorClass == null) {
 			locatorClass = NullLocator.class;

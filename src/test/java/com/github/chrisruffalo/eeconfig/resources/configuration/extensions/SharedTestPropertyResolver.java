@@ -22,7 +22,7 @@ public class SharedTestPropertyResolver extends DefaultPropertyResolver {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String resolveProperties(String fullString, Map<String, String> bootstrapProperties, Map<String, String> defaultProperties) {
+	public String resolveProperties(String fullString, Map<Object, Object> bootstrapProperties, Map<Object, Object> defaultProperties) {
 		this.count++;
 		return super.resolveProperties(fullString, bootstrapProperties, defaultProperties);
 	}

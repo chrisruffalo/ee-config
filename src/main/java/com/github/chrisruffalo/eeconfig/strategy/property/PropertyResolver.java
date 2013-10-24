@@ -27,7 +27,7 @@ public interface PropertyResolver {
 	 * 
 	 * @return string with tokens resolved where they exist and have values
 	 */
-	String resolveProperties(String fullString, Map<String, String> bootstrapProperties);
+	String resolveProperties(String fullString, Map<Object, Object> bootstrapProperties);
 	
 	/**
 	 * Resolve system properties and given properties within the provided string
@@ -38,7 +38,7 @@ public interface PropertyResolver {
 	 * 
 	 * @return string with tokens resolved where they exist and have values
 	 */
-	String resolveProperties(String fullString, Map<String, String> bootstrapProperties, Map<String, String> defaultProperties);
+	String resolveProperties(String fullString, Map<Object, Object> bootstrapProperties, Map<Object, Object> defaultProperties);
 
 	
 }
