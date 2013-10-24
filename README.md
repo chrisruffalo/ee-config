@@ -317,9 +317,9 @@ The [Locator](src/main/java/com/github/chrisruffalo/eeconfig/strategy/locator/Lo
 
 The following implementations of Locator are provided by default
 
-* [MultiLocator](src/main/java/com/github/chrisruffalo/eeconfig/strategy/locator/MultiLocator) - locates ISource elements by looking at the file system and classpath, this is the default locator
-* [FileLocator](src/main/java/com/github/chrisruffalo/eeconfig/strategy/locator/FileLocator) - locates files on the local filesystem
-* [ResourceLocator](src/main/java/com/github/chrisruffalo/eeconfig/strategy/locator/ResourceLocator) - locates resources on the classpath
+* [MultiLocator](src/main/java/com/github/chrisruffalo/eeconfig/strategy/locator/MultiLocator.java) - locates ISource elements by looking at the file system and classpath, this is the default locator
+* [FileLocator](src/main/java/com/github/chrisruffalo/eeconfig/strategy/locator/FileLocator.java) - locates files on the local filesystem
+* [ResourceLocator](src/main/java/com/github/chrisruffalo/eeconfig/strategy/locator/ResourceLocator.java) - locates resources on the classpath
 
 ### Property token resolution
 
