@@ -128,11 +128,13 @@ public class ConfigureMeWithProperties {
 	@Inject
 	@Configuration(
 		sources = {
+			// main configuration
 			@Source(
-			    value="${jboss.server.config.dir}/application/main.properties", // main configuration 
+			    value="${jboss.server.config.dir}/application/main.properties",  
 			    resolve=true // resolves system properties for this source
 			),  
-			@Source(value="resource:default.properties") // will look on classpath for default properties
+			// will look on classpath for default properties
+			@Source(value="resource:default.properties") 
 		},
 		merge = true // merges results
 	)
@@ -151,8 +153,10 @@ public class ConfigureMeWithCommonConfiguration {
 	@Inject
 	@Configuration(
 		sources = {
-			@Source("${jboss.server.config.dir}/application/main.properties", resolve=true), // main configuration
-			@Source("resource:default.properties") // will look on classpath for default properties
+		    // main configuration
+			@Source("${jboss.server.config.dir}/application/main.properties", resolve=true),
+			// will look on classpath for default properties 
+			@Source("resource:default.properties")
 		},
 		merge = true // merges results
 	)
@@ -171,8 +175,10 @@ public class ConfigureMeAnInputStream {
 	@Inject
 	@Configuration(
 		sources = {
-			@Source("${jboss.server.config.dir}/application/main.properties", resolve=true), // main configuration
-			@Source("resource:default.properties") // will look on classpath for default properties
+		    // main configuration
+			@Source("${jboss.server.config.dir}/application/main.properties", resolve=true),
+			// will look on classpath for default properties 
+			@Source("resource:default.properties") 
 		}
 	)
 	private InputStream configStream; 
@@ -201,8 +207,10 @@ public class ConfigureMeAnInputStream {
 	@Inject
 	@Configuration(
 		sources = {
-			@Source("${jboss.server.config.dir}/application/main.properties", resolve=true), // main configuration
-			@Source("resource:default.properties") // will look on classpath for default properties
+		    // main configuration
+			@Source("${jboss.server.config.dir}/application/main.properties", resolve=true), 
+			// will look on classpath for default properties
+			@Source("resource:default.properties") 
 		},
 		resolveSystemProperties = true, // resolves system properties in paths
 	)
@@ -232,8 +240,10 @@ public class ConfigureFromRawSources {
 	@Inject
 	@Configuration(
 		sources = {
-			@Source("${jboss.server.config.dir}/application/main.properties", resolve=true), // main configuration
-			@Source("resource:default.properties") // will look on classpath for default properties
+		    // main configuration
+			@Source("${jboss.server.config.dir}/application/main.properties", resolve=true), 
+			// will look on classpath for default properties
+			@Source("resource:default.properties")
 		}
 	)
 	private List<IConfigurationSource> configSources; 
@@ -251,6 +261,11 @@ public class ConfigureFromRawSources {
 			InputStream stream = source.stream();
 
 			// implement reading the stream where you want it to go...
+			
+			/* ... <snip> ... */
+			
+			// close the stream
+			stream.close();
 		}
 	}
 }
@@ -302,13 +317,13 @@ The [Locator](src/main/java/com/github/chrisruffalo/eeconfig/strategy/locator/Lo
 
 The following implementations of Locator are provided by default
 
-* MultiLocator - locates ISource elements by looking at the file system and classpath, this is the default locator
-* FileLocator - locates files on the local filesystem
-* ResourceLocator - locates resources on the classpath
+* [MultiLocator](src/main/java/com/github/chrisruffalo/eeconfig/strategy/locator/MultiLocator) - locates ISource elements by looking at the file system and classpath, this is the default locator
+* [FileLocator](src/main/java/com/github/chrisruffalo/eeconfig/strategy/locator/FileLocator) - locates files on the local filesystem
+* [ResourceLocator](src/main/java/com/github/chrisruffalo/eeconfig/strategy/locator/ResourceLocator) - locates resources on the classpath
 
 ### Property token resolution
 
-You can implement your own [PropertyResolver](src/main/java/com/github/chrisruffalo/eeconfig/strategy/property/PropertyResolver.java).  There is also a [default implementation](src/main/java/com/github/chrisruffalo/eeconfig/strategy/property/DefaultPropertyResolver.java) to handle the resolution of properties within the resource paths.  This could be overriden to provide different token types or possibly even a pre-seeded property set.
+You can implement your own [PropertyResolver](src/main/java/com/github/chrisruffalo/eeconfig/strategy/property/PropertyResolver.java).  There is also a [default implementation](src/main/java/com/github/chrisruffalo/eeconfig/strategy/property/DefaultPropertyResolver.java) to handle the resolution of properties within the resource paths.  This could be overriden to provide different token types or possibly even a pre-seeded property set.  You can load properties from the database, filesystem, or just about anywhere you need to in order to get the base values for your application.
 
 ### Putting it to work
 
@@ -318,12 +333,11 @@ Let's say you *do* want some form of custom resolution.
 public class ConfigureMeWithCustomBehavior {
 	@Inject
 	@Configuration(
-		paths = {
-			"@@jboss.server.config.dir@@/application/main.properties" // main configuration
+	    // main configuration
+		sources = {
+			@Source("@@jboss.server.config.dir@@/application/main.properties", resolve=true, locator=CustomLocator.class) 
 		},
-		resolveSystemProperties = true, // resolves system properties in paths
-		locator = com.example.CustomLocator.class, // custom locator class
-		propertyResolver = com.example.CustomResolver.class // custom property resolver
+		resolver = com.example.CustomResolver.class // custom property resolver
 	)
 	private Properties properties; 
 	
