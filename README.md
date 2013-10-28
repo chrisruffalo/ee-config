@@ -49,7 +49,7 @@ The project 'ee-config' has been in maven central since version 1.0.
 
 ### Logging
 
-Because we find it useful and because I use it all the time this library includes a method injecting a SLF4J logger.  The '@AutoLogger' qualifier is uesd so that the included Logger producer can easily be ignored or overriden.
+Because we find it useful and because I use it all the time this library includes a method injecting a logger.  The '@Logging' qualifier is used so that the included Logger producer can easily be ignored or overridden.
 
 ``` java
 public class INeedALogger {
@@ -57,6 +57,10 @@ public class INeedALogger {
 	@Inject
 	@Logging
 	private Logger logger;
+	
+	@Inject
+    @Logging("named-logger")
+    private Logger namedLogger;
 	
 	@PostConstruct
 	public void init() {
@@ -66,7 +70,7 @@ public class INeedALogger {
 }
 ```
 
-The created logger is created using the class name of the injection target.
+The first injected logger is created using the class name of the injection target.  The second injected logger is created using the specified name.  EE-Config supports both `java.util.logging` loggers and SLF4J loggers as injection targets.  (Since version 1.4.)
 
 ### System Properties
 
@@ -316,7 +320,7 @@ Using this method you'll be able to implement whatever crazy scheme you can come
 
 ## Extending EE-Configuration default behavior
 
-There are two extendable behaviors in EE-Config.  Each of these is governed by a strategy.  These strategies can be overriden to produce different behaviors for finding resources and files.
+There are two extendable behaviors in EE-Config.  Each of these is governed by a strategy.  These strategies can be overridden to produce different behaviors for finding resources and files.
 
 **Each of these strategies *must* have a public no-arg constructor.**  If they do not then they will not be usable and the default implementation of each will be used instead.
 
