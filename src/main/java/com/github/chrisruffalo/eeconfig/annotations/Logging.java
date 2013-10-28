@@ -9,12 +9,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import javax.enterprise.util.Nonbinding;
 import javax.inject.Qualifier;
 
 /**
- * Used to qualify provided SLF4J logger so that it will
- * not collide with whatever logger might be provided
- * by the hosting application.
+ * Configure the logger that will be injected.
  * 
  * @author Chris Ruffalo
  * 
@@ -22,6 +21,22 @@ import javax.inject.Qualifier;
 @Qualifier
 @Retention(RUNTIME)
 @Target({ METHOD, FIELD, PARAMETER, TYPE })
-public @interface AutoLogger {
+public @interface Logging {
 
+	/**
+	 * Name of the logger to use
+	 * 
+	 * @return
+	 */
+	@Nonbinding
+	String name() default "";
+	
+	/**
+	 * Resolver to use when resolving properties in
+	 * the name of the resolver 
+	 * 
+	 * @return
+	 */
+	@Nonbinding
+	Resolver resolver() default @Resolver();
 }

@@ -10,10 +10,10 @@ import com.github.chrisruffalo.eeconfig.annotations.Configuration;
  * @author Chris Ruffalo
  *
  */
-public final class ConfigurationWrapperFactory {
+public final class WrapperFactory {
 
 	// private constructor for factory/static class
-	private ConfigurationWrapperFactory() {
+	private WrapperFactory() {
 		
 	}
 	
@@ -41,4 +41,5 @@ public final class ConfigurationWrapperFactory {
 		// should not get here
 		throw new IllegalArgumentException("The object " + toWrap.getClass() + " cannot be wrapped");
 	}
+	
 }

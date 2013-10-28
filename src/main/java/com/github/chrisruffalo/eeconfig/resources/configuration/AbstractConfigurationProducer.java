@@ -1,38 +1,28 @@
 package com.github.chrisruffalo.eeconfig.resources.configuration;
 
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.Instance;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
 
-import org.apache.commons.configuration.ConfigurationMap;
 import org.slf4j.Logger;
 
-import com.github.chrisruffalo.eeconfig.annotations.AutoLogger;
 import com.github.chrisruffalo.eeconfig.annotations.Configuration;
-import com.github.chrisruffalo.eeconfig.annotations.Property;
-import com.github.chrisruffalo.eeconfig.annotations.Resolver;
+import com.github.chrisruffalo.eeconfig.annotations.Logging;
 import com.github.chrisruffalo.eeconfig.annotations.Source;
+import com.github.chrisruffalo.eeconfig.resources.BeanResolver;
+import com.github.chrisruffalo.eeconfig.resources.ResolverFactory;
 import com.github.chrisruffalo.eeconfig.source.ISource;
 import com.github.chrisruffalo.eeconfig.source.impl.UnfoundSource;
 import com.github.chrisruffalo.eeconfig.strategy.locator.Locator;
 import com.github.chrisruffalo.eeconfig.strategy.locator.NullLocator;
-import com.github.chrisruffalo.eeconfig.strategy.property.DefaultPropertyResolver;
 import com.github.chrisruffalo.eeconfig.strategy.property.PropertyResolver;
 import com.github.chrisruffalo.eeconfig.wrapper.ConfigurationWrapper;
-import com.github.chrisruffalo.eeconfig.wrapper.ConfigurationWrapperFactory;
+import com.github.chrisruffalo.eeconfig.wrapper.WrapperFactory;
 import com.github.chrisruffalo.eeconfig.wrapper.ResolverWrapper;
 
 /**
@@ -44,14 +34,14 @@ import com.github.chrisruffalo.eeconfig.wrapper.ResolverWrapper;
 public abstract class AbstractConfigurationProducer {
 	
 	@Inject
-	@AutoLogger
+	@Logging
 	private Logger logger;
 	
 	@Inject
-	private Instance<CommonsConfigurationProducer> producer;
+	private ResolverFactory resolverFactory;
 	
 	@Inject
-	private BeanManager manager;
+	private BeanResolver beanResolver;
 	
 	/**
 	 * Utility to get {@link Configuration} annotation from the
@@ -64,7 +54,7 @@ public abstract class AbstractConfigurationProducer {
 	 */
 	protected ConfigurationWrapper getConfigurationWrapper(InjectionPoint injectionPoint) {
 		Configuration configuration = injectionPoint.getAnnotated().getAnnotation(Configuration.class);
-		return ConfigurationWrapperFactory.wrap(configuration);
+		return WrapperFactory.wrap(configuration);
 	}
 	
 	/**
@@ -83,9 +73,9 @@ public abstract class AbstractConfigurationProducer {
 		
 		// create resolver from configuration annotation's resolver element
 		ResolverWrapper resolverWrapper = configuration.resolver();
-		PropertyResolver resolver = this.createPropertyResolver(resolverWrapper);
-		Map<Object,Object> bootstrapMap = this.getBootstrapProperties(resolverWrapper);
-		Map<Object,Object> defaultMap = this.getDefaultProperties(resolverWrapper);
+		PropertyResolver resolver = this.resolverFactory.createPropertyResolver(resolverWrapper);
+		Map<Object,Object> bootstrapMap = this.resolverFactory.getBootstrapProperties(resolverWrapper);
+		Map<Object,Object> defaultMap = this.resolverFactory.getDefaultProperties(resolverWrapper);
 		
 		// found sources
 		List<ISource> foundSources = new ArrayList<ISource>(0);
@@ -108,95 +98,7 @@ public abstract class AbstractConfigurationProducer {
 		
 		return foundSources;
 	}
-	
-	/**
-	 * Resolve the property resolver instance to use from the {@link Resolver} 
-	 * annotation in the configuration element
-	 * 
-	 * @param resolverAnnotation
-	 * @return
-	 */
-	private PropertyResolver createPropertyResolver(ResolverWrapper resolverAnnotation) {
-		PropertyResolver resolver = null;
 		
-		// use the impl class to get the property resolver
-		Class<? extends PropertyResolver> propertyResolverClass = resolverAnnotation.impl();
-		if(propertyResolverClass == null) {
-			this.logger.debug("No alternate property resolver provided, using default");
-			propertyResolverClass = DefaultPropertyResolver.class;
-		} else {
-			this.logger.debug("Requesting alternate property resolver: {}", propertyResolverClass.getName());
-		}
-		resolver = this.resolveBeanWithDefaultClass(propertyResolverClass, DefaultPropertyResolver.class);
-		
-		return resolver;
-	}
-	
-	/**
-	 * Get the properties used to bootstrap the resolver
-	 * 
-	 * @param resolver
-	 * @return
-	 */
-	private Map<Object, Object> getBootstrapProperties(ResolverWrapper resolver) {
-		// return empty map
-		if(resolver.bootstrap() == null) {
-			return Collections.emptyMap();	
-		}
-		
-		// get configuration wrapper
-		ConfigurationWrapper wrapper = ConfigurationWrapperFactory.wrap(resolver.bootstrap());
-		
-		// bail early if nothing to do
-		if(wrapper.sources() == null || wrapper.sources().length == 0) {
-			return Collections.emptyMap();
-		}
-		
-		// obtain instance of CommonsConfiguration provider
-		CommonsConfigurationProducer instance = this.producer.get();
-		
-		// get commons configuration object from bootstrap
-		org.apache.commons.configuration.Configuration config = instance.getConfiguration(wrapper);
-		
-		// wrap as map and return
-		ConfigurationMap map = new ConfigurationMap(config);
-		return map;
-	}
-	
-	/**
-	 * Get the properties that should be used as defaults when no other
-	 * properties are found for that value
-	 * 
-	 * @param resolver
-	 * @return
-	 */
-	private Map<Object, Object> getDefaultProperties(ResolverWrapper resolver) {
-		// if no resolver is given or the list of default properties is empty then 
-		// return an empty map
-		if(resolver == null || resolver.properties() == null || resolver.properties().length == 0) {
-			return Collections.emptyMap();
-		}
-		
-		// get properties from the resolver annotation
-		Property[] properties = resolver.properties();
-		
-		// copy each property annotation into the map for later use
-		Map<Object, Object> propertyMap = new HashMap<>(properties.length);
-		for(Property property : properties) {
-			// nulls and empty keys are bad
-			if(property.key() == null || property.key().isEmpty() || property.value() == null) {
-				continue;
-			}
-			// no dupes
-			if(propertyMap.containsKey(property.key())) {
-				continue;
-			}
-			// put in map
-			propertyMap.put(property.key(), property.value());
-		}		
-		return propertyMap;
-	}
-	
 	/**
 	 * Resolve a given source from the provided {@link Source} annotation
 	 * 
@@ -209,7 +111,7 @@ public abstract class AbstractConfigurationProducer {
 		if(locatorClass == null) {
 			locatorClass = NullLocator.class;
 		}
-		Locator locator = this.resolveBeanWithDefaultClass(locatorClass, NullLocator.class);
+		Locator locator = this.beanResolver.resolveBeanWithDefaultClass(locatorClass, NullLocator.class);
 		this.logger.trace("Using locator: '{}'", locator.getClass().getName());
 		
 		// resolve path if enabled
@@ -228,43 +130,5 @@ public abstract class AbstractConfigurationProducer {
 		this.logger.trace("Source: '{}' (using locator '{}')", foundSource, locator.getClass().getName());
 		return foundSource;
 	}
-	
-	/**
-	 * Resolve managed bean for given type
-	 * 
-	 * @param typeToResolve
-	 * @param defaultType
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	private <B, T extends B, D extends B> B resolveBeanWithDefaultClass(Class<T> typeToResolve, Class<D> defaultType) {
 
-		// if type to resolve is null, do nothing, not even the default
-		if(typeToResolve == null) {
-			return null;
-		}
-		
-		// get candidate resolve types
-		Set<Bean<?>> candidates = this.manager.getBeans(typeToResolve);
-		
-		// if no candidates are available, resolve
-		// using next class up
-		if(!candidates.iterator().hasNext()) {
-			this.logger.trace("No candidates for: {}", typeToResolve.getName());
-			// try and resolve only the default type
-			return resolveBeanWithDefaultClass(defaultType, null);
-		} 
-		
-		this.logger.trace("Requesting resolution on: {}", typeToResolve.getName());
-		
-		// get candidate
-		Bean<?> bean = candidates.iterator().next();
-		CreationalContext<?> context = this.manager.createCreationalContext(bean);
-		Type type = (Type) bean.getTypes().iterator().next();
-	    B result = (B)this.manager.getReference(bean, type, context);
-		
-		this.logger.trace("Resolved to: {}", result.getClass().getName());
-		
-		return result;
-	}
 }

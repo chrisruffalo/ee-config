@@ -14,7 +14,7 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
-import com.github.chrisruffalo.eeconfig.annotations.AutoLogger;
+import com.github.chrisruffalo.eeconfig.annotations.Logging;
 import com.github.chrisruffalo.eeconfig.annotations.Configuration;
 import com.github.chrisruffalo.eeconfig.source.ISource;
 import com.github.chrisruffalo.eeconfig.wrapper.ConfigurationWrapper;
@@ -30,7 +30,7 @@ import com.github.chrisruffalo.eeconfig.wrapper.ConfigurationWrapper;
 public class InputStreamConfigurationProducer extends AbstractConfigurationProducer {
 
 	@Inject
-	@AutoLogger
+	@Logging
 	private Logger logger;
 	
 	/**
