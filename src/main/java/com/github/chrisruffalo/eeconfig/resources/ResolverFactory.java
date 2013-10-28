@@ -12,7 +12,7 @@ import org.apache.commons.configuration.ConfigurationMap;
 import org.slf4j.Logger;
 
 import com.github.chrisruffalo.eeconfig.annotations.Logging;
-import com.github.chrisruffalo.eeconfig.annotations.Property;
+import com.github.chrisruffalo.eeconfig.annotations.DefaultProperty;
 import com.github.chrisruffalo.eeconfig.annotations.Resolver;
 import com.github.chrisruffalo.eeconfig.resources.configuration.CommonsConfigurationProducer;
 import com.github.chrisruffalo.eeconfig.strategy.property.DefaultPropertyResolver;
@@ -103,11 +103,11 @@ public class ResolverFactory {
 		}
 		
 		// get properties from the resolver annotation
-		Property[] properties = resolver.properties();
+		DefaultProperty[] properties = resolver.properties();
 		
 		// copy each property annotation into the map for later use
 		Map<Object, Object> propertyMap = new HashMap<>(properties.length);
-		for(Property property : properties) {
+		for(DefaultProperty property : properties) {
 			// nulls and empty keys are bad
 			if(property.key() == null || property.key().isEmpty() || property.value() == null) {
 				continue;

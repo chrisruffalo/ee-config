@@ -122,7 +122,7 @@ public class DefaultPropertyResolver implements PropertyResolver {
 			// we can consider it safe to return because it's either recursive or
 			// cyclic
 			if(previousValues.contains(output)) {
-				this.logger.warn("Cyclic or recursive property resolution found for '{}', done resolving properties", output);
+				this.logger.trace("Cyclic or recursive property resolution found for '{}', done resolving properties", output);
 				break;
 			}
 			

@@ -14,7 +14,7 @@ import org.junit.runner.RunWith;
 
 import com.github.chrisruffalo.eeconfig.annotations.Bootstrap;
 import com.github.chrisruffalo.eeconfig.annotations.Logging;
-import com.github.chrisruffalo.eeconfig.annotations.Property;
+import com.github.chrisruffalo.eeconfig.annotations.DefaultProperty;
 import com.github.chrisruffalo.eeconfig.annotations.Resolver;
 import com.github.chrisruffalo.eeconfig.annotations.Source;
 import com.github.chrisruffalo.eeconfig.support.DeploymentFactory;
@@ -55,7 +55,7 @@ public class JavaLoggingProducerTest {
 					sources=@Source("resource:properties/bootstrap.properties")
 				),
 				properties={
-					@Property(key="local", value="bridge")
+					@DefaultProperty(key="local", value="bridge")
 				}
 			)
 		)			

@@ -10,7 +10,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.github.chrisruffalo.eeconfig.annotations.SystemProperty;
+import com.github.chrisruffalo.eeconfig.annotations.Property;
 import com.github.chrisruffalo.eeconfig.support.DeploymentFactory;
 
 /**
@@ -20,7 +20,7 @@ import com.github.chrisruffalo.eeconfig.support.DeploymentFactory;
  *
  */
 @RunWith(Arquillian.class)
-public class SystemPropertyProducerTest {
+public class PropertyProducerTest {
 	
 	@Deployment
 	public static JavaArchive deployment() {
@@ -35,7 +35,7 @@ public class SystemPropertyProducerTest {
 	 */
 	@Test
 	@Inject
-	public void testEmptyPropertyName(@SystemProperty(key="") String property) {
+	public void testEmptyPropertyName(@Property("") String property) {
 		Assert.assertEquals("", property);
 	}
 
@@ -46,7 +46,7 @@ public class SystemPropertyProducerTest {
 	 */
 	@Test
 	@Inject
-	public void testNonexistentPropertyName(@SystemProperty(key="no.property.exists") String property) {
+	public void testNonexistentPropertyName(@Property("${no.property.exists}") String property) {
 		Assert.assertEquals("", property);
 	}
 	
@@ -57,7 +57,7 @@ public class SystemPropertyProducerTest {
 	 */
 	@Test
 	@Inject
-	public void testTempDir(@SystemProperty(key="java.io.tmpdir") String property) {
+	public void testTempDir(@Property("${java.io.tmpdir}") String property) {
 		Assert.assertNotNull(property);
 		Assert.assertFalse(property.isEmpty());
 	}
@@ -70,7 +70,7 @@ public class SystemPropertyProducerTest {
 	 */
 	@Test
 	@Inject
-	public void testTempDirWithDefault(@SystemProperty(key="java.io.tmpdir", defaultValue="dir") String property) {
+	public void testTempDirWithDefault(@Property(value="${java.io.tmpdir}", defaultValue="dir") String property) {
 		Assert.assertNotNull(property);
 		Assert.assertFalse(property.isEmpty());
 		Assert.assertFalse("dir".equals(property));
@@ -84,7 +84,7 @@ public class SystemPropertyProducerTest {
 	 */
 	@Test
 	@Inject
-	public void testDefaultProperty(@SystemProperty(key="no.property.found", defaultValue="default") String property) {
+	public void testDefaultProperty(@Property(value="${no.property.found}", defaultValue="default") String property) {
 		Assert.assertNotNull(property);
 		Assert.assertEquals("default", property);
 	}

@@ -74,18 +74,22 @@ The first injected logger is created using the class name of the injection targe
 
 ### System Properties
 
-One of the first things we thought to inject was system properties.  This means that you can inject either the usual Java properties (like 'java.io.tmpdir') or system properties set by your container (like 'jboss.server.config.dir').
+One of the first things we thought to inject was properties.  This means that you can inject either the usual Java properties (like 'java.io.tmpdir'), system properties set by your container (like 'jboss.server.config.dir'), or properties configured from an external source.
 
 ``` java
 public class INeedSystemProperties {
 	
+    @Inject
+    @Property(value="${jboss.server.config.dir}")
+    private String configDirPath;
+    
 	@Inject
-	@SystemProperty(key="java.io.tmpdir", defaultValue="/tmp")
+	@Property(value="${java.io.tmpdir}", defaultValue="${application.tmp.dir}")
 	private String tmpDirPath;
 
 	@Inject
-	@SystemProperty(key="jboss.server.config.dir")
-	private String configDirPath;
+	@Property(value="${application.tmp.dir}/${application.node}", defaultValue="${java.io.tmpdir}/${application.node}")
+	private String tmpApplicationPath;
 
 	@PostConstruct
 	public void init() {
@@ -94,8 +98,44 @@ public class INeedSystemProperties {
 }
 ```
 
-This example shows, simply, the ability to inject system properties into your application and use them directly.  You will not need to do anything more.  This example also demonstrates the use of the 'defaultValue' annotation property which will be returned in the event that the system property is not defined.
+This example shows, simply, the ability to inject system properties into your application and use them directly.  
+You will not need to do anything more.  
+This example also demonstrates the use of the 'defaultValue' annotation property which will be returned in the event that the system property is not defined.
+The final injection target shows how to use the built-in property resolution mechanism to create more complex properties.  
+Using this method it would be possible to define different paths within the temporary directory depending on what node of the clustered setup you were running, for example.  
 
+It is also possible to configure the property resolution process in various ways
+
+``` java
+public class INeedSystemProperties {
+    
+    @Inject
+    @Property(
+        key="application.tmpdir", 
+        defaultValue="${java.io.tmpdir}", 
+        resolver=@Resolver(
+            bootstrap=@Bootstrap(
+                sources={
+                    @Source("resource:application.properties")
+                }
+                properties={
+                    @DefaultProperty(key="java.io.tmpdir", value="/tmp")
+                }
+            )
+        )
+    )
+    private String tmpDirPath;
+
+    @PostConstruct
+    public void init() {
+        // logic goes here
+    }
+}
+```
+
+There is a lot going on in this example.  
+We're loading a property key called "application.tmpdir" but we're resolving it using a set of application properties that come from a file on the classpath called 'application.properties'.  But we've also configured a fallback default value that is resolved from the system or container property "java.io.tmpdir"".
+In the bootstrap we've given a default value for "java.io.tmpdir" of "/tmp" but the application properties file may give a different value for that.  In this way you can set a deployment specific property ("C:\Tmp") but have a sensible default (like "/tmp").
 
 ### Configuration
 

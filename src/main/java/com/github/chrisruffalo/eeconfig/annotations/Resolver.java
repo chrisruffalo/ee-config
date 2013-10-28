@@ -54,5 +54,5 @@ public @interface Resolver {
 	 * @return key/value pairs for property defaults
 	 */
 	@Nonbinding
-	Property[] properties() default {};
+	DefaultProperty[] properties() default {};
 }

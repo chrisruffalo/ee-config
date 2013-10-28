@@ -2,7 +2,7 @@ package com.github.chrisruffalo.eeconfig.wrapper;
 
 import com.github.chrisruffalo.eeconfig.annotations.Bootstrap;
 import com.github.chrisruffalo.eeconfig.annotations.BootstrapResolver;
-import com.github.chrisruffalo.eeconfig.annotations.Property;
+import com.github.chrisruffalo.eeconfig.annotations.DefaultProperty;
 import com.github.chrisruffalo.eeconfig.strategy.property.PropertyResolver;
 
 /**
@@ -45,7 +45,7 @@ public class BootstrapResolverAnnotationWrapper implements ResolverWrapper {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Property[] properties() {
+	public DefaultProperty[] properties() {
 		return this.delegate.properties();
 	}
 

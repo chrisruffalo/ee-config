@@ -11,7 +11,7 @@ import org.junit.runner.RunWith;
 
 import com.github.chrisruffalo.eeconfig.annotations.Bootstrap;
 import com.github.chrisruffalo.eeconfig.annotations.Configuration;
-import com.github.chrisruffalo.eeconfig.annotations.Property;
+import com.github.chrisruffalo.eeconfig.annotations.DefaultProperty;
 import com.github.chrisruffalo.eeconfig.annotations.Resolver;
 import com.github.chrisruffalo.eeconfig.annotations.Source;
 import com.github.chrisruffalo.eeconfig.support.DeploymentFactory;
@@ -39,7 +39,7 @@ public class BootstrapedConfigurationTest {
 					sources=@Source("resource:properties/bootstrap.properties")
 				),
 				properties={
-					@Property(key="file", value="priority")
+					@DefaultProperty(key="file", value="priority")
 				}
 			)
 			
@@ -72,10 +72,10 @@ public class BootstrapedConfigurationTest {
 					sources=@Source("resource:properties/bootstrap.properties")
 				),
 				properties={
-					@Property(key="file", value="priority"),
-					@Property(key="extension", value="bad"),
-					@Property(key="propertiesPath", value="none"),
-					@Property(key="file", value="dupe"),
+					@DefaultProperty(key="file", value="priority"),
+					@DefaultProperty(key="extension", value="bad"),
+					@DefaultProperty(key="propertiesPath", value="none"),
+					@DefaultProperty(key="file", value="dupe"),
 				}
 			)
 			

@@ -9,7 +9,7 @@ import java.util.Map;
  *
  */
 public interface PropertyResolver {
-
+	
 	/**
 	 * Resolve system properties within the provided string
 	 * 
