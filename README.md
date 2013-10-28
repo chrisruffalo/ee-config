@@ -51,6 +51,10 @@ The project 'ee-config' has been in maven central since version 1.0.
 
 Because we find it useful and because I use it all the time this library includes a method injecting a logger.  The '@Logging' qualifier is used so that the included Logger producer can easily be ignored or overridden.
 
+EE-Config supports the following types of logging:
+ * SLF4J
+ * `java.util.logging` 
+
 ``` java
 public class INeedALogger {
 	
@@ -70,7 +74,7 @@ public class INeedALogger {
 }
 ```
 
-The first injected logger is created using the class name of the injection target.  The second injected logger is created using the specified name.  EE-Config supports both `java.util.logging` loggers and SLF4J loggers as injection targets.  (Since version 1.4.)
+The first injected logger is created using the class name of the injection target.  The second injected logger is created using the specified name. 
 
 ### System Properties
 
@@ -88,7 +92,10 @@ public class INeedSystemProperties {
 	private String tmpDirPath;
 
 	@Inject
-	@Property(value="${application.tmp.dir}/${application.node}", defaultValue="${java.io.tmpdir}/${application.node}")
+	@Property(
+	   value="${application.tmp.dir}/${application.node}", 
+	   defaultValue="${java.io.tmpdir}/${application.node}"
+	)
 	private String tmpApplicationPath;
 
 	@PostConstruct
@@ -98,11 +105,7 @@ public class INeedSystemProperties {
 }
 ```
 
-This example shows, simply, the ability to inject system properties into your application and use them directly.  
-You will not need to do anything more.  
-This example also demonstrates the use of the 'defaultValue' annotation property which will be returned in the event that the system property is not defined.
-The final injection target shows how to use the built-in property resolution mechanism to create more complex properties.  
-Using this method it would be possible to define different paths within the temporary directory depending on what node of the clustered setup you were running, for example.  
+This example shows, simply, the ability to inject system properties into your application and use them directly.  You will not need to do anything more.  This example also demonstrates the use of the 'defaultValue' annotation property which will be returned in the event that the system property is not defined.  The final injection target shows how to use the built-in property resolution mechanism to create more complex properties.  Using this method it would be possible to define different paths within the temporary directory depending on what node of the clustered setup you were running, for example.  
 
 It is also possible to configure the property resolution process in various ways
 
@@ -111,7 +114,7 @@ public class INeedSystemProperties {
     
     @Inject
     @Property(
-        key="application.tmpdir", 
+        value="${application.tmpdir}", 
         defaultValue="${java.io.tmpdir}", 
         resolver=@Resolver(
             bootstrap=@Bootstrap(
@@ -133,9 +136,7 @@ public class INeedSystemProperties {
 }
 ```
 
-There is a lot going on in this example.  
-We're loading a property key called "application.tmpdir" but we're resolving it using a set of application properties that come from a file on the classpath called 'application.properties'.  But we've also configured a fallback default value that is resolved from the system or container property "java.io.tmpdir"".
-In the bootstrap we've given a default value for "java.io.tmpdir" of "/tmp" but the application properties file may give a different value for that.  In this way you can set a deployment specific property ("C:\Tmp") but have a sensible default (like "/tmp").
+There is a lot going on in this example. We're loading a property key called "application.tmpdir" but we're resolving it using a set of application properties that come from a file on the classpath called 'application.properties'.  But we've also configured a fallback default value that is resolved from the system or container property "java.io.tmpdir". In the bootstrap we've given a default value for "java.io.tmpdir" of "/tmp" but the application properties file may give a different value for that.  In this way you can set a deployment specific property ("C:\Tmp") but have a sensible default (like "/tmp").
 
 ### Configuration
 
@@ -376,7 +377,9 @@ The following implementations of Locator are provided by default
 * [FileLocator](src/main/java/com/github/chrisruffalo/eeconfig/strategy/locator/FileLocator.java) - locates files on the local filesystem
 * [ResourceLocator](src/main/java/com/github/chrisruffalo/eeconfig/strategy/locator/ResourceLocator.java) - locates resources on the classpath
 
-### Property token resolution
+### Property Resolution
+
+Throughout the document various different `@Resolver` annotations have been used without much description as to why or what that does.  The `@Resolver` annotation allows you to plug in your own resolution implementation so that the default strategy (provided property files -> system properties -> default properties) can be updated, changed, or modified.   
 
 You can implement your own [PropertyResolver](src/main/java/com/github/chrisruffalo/eeconfig/strategy/property/PropertyResolver.java).  There is also a [default implementation](src/main/java/com/github/chrisruffalo/eeconfig/strategy/property/DefaultPropertyResolver.java) to handle the resolution of properties within the resource paths.  This could be overriden to provide different token types or possibly even a pre-seeded property set.  You can load properties from the database, filesystem, or just about anywhere you need to in order to get the base values for your application.
 
