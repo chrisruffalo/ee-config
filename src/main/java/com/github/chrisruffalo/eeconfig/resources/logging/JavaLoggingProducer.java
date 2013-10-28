@@ -1,17 +1,16 @@
-package com.github.chrisruffalo.eeconfig.resources;
+package com.github.chrisruffalo.eeconfig.resources.logging;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.chrisruffalo.eeconfig.annotations.Logging;
 import com.github.chrisruffalo.eeconfig.annotations.Resolver;
+import com.github.chrisruffalo.eeconfig.resources.ResolverFactory;
 import com.github.chrisruffalo.eeconfig.strategy.property.PropertyResolver;
 import com.github.chrisruffalo.eeconfig.wrapper.ResolverAnnotationWrapper;
 import com.github.chrisruffalo.eeconfig.wrapper.ResolverWrapper;
@@ -24,7 +23,7 @@ import com.github.chrisruffalo.eeconfig.wrapper.ResolverWrapper;
  *
  */
 @ApplicationScoped
-public class LoggingProducer {
+public class JavaLoggingProducer {
 
 	@Inject
 	private ResolverFactory resolverFactory;	
@@ -61,7 +60,7 @@ public class LoggingProducer {
 		String resolvedName = resolver.resolveProperties(name, bootstrapMap, defaultMap);
 				
 		// otherwise use the name to create the logger
-		return LoggerFactory.getLogger(resolvedName);
+		return Logger.getLogger(resolvedName);
 	}
 	
 	/**
@@ -71,7 +70,7 @@ public class LoggingProducer {
 	 * @return
 	 */
 	private Logger createClassLogger(InjectionPoint injectionPoint) {
-		return LoggerFactory.getLogger(injectionPoint.getMember().getDeclaringClass().getName());
+		return Logger.getLogger(injectionPoint.getMember().getDeclaringClass().getName());
 	}
 	
 }

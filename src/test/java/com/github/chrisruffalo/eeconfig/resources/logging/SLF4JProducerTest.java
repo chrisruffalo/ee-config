@@ -1,4 +1,4 @@
-package com.github.chrisruffalo.eeconfig.resources;
+package com.github.chrisruffalo.eeconfig.resources.logging;
 
 import javax.inject.Inject;
 
@@ -25,7 +25,7 @@ import com.github.chrisruffalo.eeconfig.support.DeploymentFactory;
  *
  */
 @RunWith(Arquillian.class)
-public class LoggingProducerTest {
+public class SLF4JProducerTest {
 
 	@Deployment
 	public static JavaArchive deployment() {

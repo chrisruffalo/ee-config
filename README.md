@@ -55,7 +55,7 @@ Because we find it useful and because I use it all the time this library include
 public class INeedALogger {
 	
 	@Inject
-	@AutoLogger
+	@Logging
 	private Logger logger;
 	
 	@PostConstruct
