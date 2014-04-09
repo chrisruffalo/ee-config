@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.chrisruffalo</groupId>
     <artifactId>ee-config</artifactId>
-    <version>1.4-SNAPSHOT</version>
+    <version>1.4</version>
     <packaging>jar</packaging>
     <name>ee-config</name>
     <description>annotations and helpers for easier configuration of ee applications</description>
@@ -43,7 +43,8 @@
         <connection>scm:git:git@github.com:chrisruffalo/ee-config.git</connection>
         <url>scm:git:git@github.com:chrisruffalo/ee-config.git</url>
         <developerConnection>scm:git:git@github.com:chrisruffalo/ee-config.git</developerConnection>
-    </scm>
+      <tag>ee-config-1.4</tag>
+  </scm>
 
     <!-- licensing information -->
     <licenses>
