@@ -17,34 +17,59 @@ import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.configuration.tree.OverrideCombiner;
 import org.slf4j.Logger;
 
-import com.github.chrisruffalo.eeconfig.annotations.AutoLogger;
+import com.github.chrisruffalo.eeconfig.annotations.Logging;
 import com.github.chrisruffalo.eeconfig.annotations.Configuration;
 import com.github.chrisruffalo.eeconfig.mime.MimeGuesser;
 import com.github.chrisruffalo.eeconfig.mime.SupportedType;
-import com.github.chrisruffalo.eeconfig.resources.configuration.source.IConfigurationSource;
+import com.github.chrisruffalo.eeconfig.source.ISource;
+import com.github.chrisruffalo.eeconfig.wrapper.ConfigurationWrapper;
 
+/**
+ * Provides configuration injections to satisfy injection points for various
+ * Commons Configuration types
+ * 
+ * @author Chris Ruffalo
+ *
+ */
 @ApplicationScoped
 public class CommonsConfigurationProducer extends AbstractConfigurationProducer {
 
 	@Inject
-	@AutoLogger
+	@Logging
 	private Logger logger;
 	
+	/**
+	 * Given the injection point, resolve an instance of Apache Commons Configuration
+	 * 
+	 * @param injectionPoint
+	 * @return
+	 */
 	@Produces
-	@Configuration(paths={})
+	@Configuration
 	public org.apache.commons.configuration.Configuration getConfiguration(InjectionPoint injectionPoint) {
 		// get configuration annotation
-		Configuration annotation = this.getAnnotation(injectionPoint);
-		
+		ConfigurationWrapper annotation = this.getConfigurationWrapper(injectionPoint);
+		// use shared implementation to get configuration
+		return this.getConfiguration(annotation);
+	}
+	
+	/**
+	 * Shared implementation that is used to bootstrap other configurations if
+	 * requested.
+	 * 
+	 * @param wrapper the annotation to use for configuring
+	 * @return the common configuration values
+	 */
+	public org.apache.commons.configuration.Configuration getConfiguration(ConfigurationWrapper wrapper) {
 		// get input streams
-		List<IConfigurationSource> sources = this.locate(annotation);
+		List<ISource> sources = this.locate(wrapper);
 		
 		// create configuration combiner
 		OverrideCombiner combiner = new OverrideCombiner();
 		CombinedConfiguration combined = new CombinedConfiguration(combiner);
 		
 		// combine configurations
-		for(IConfigurationSource source : sources) {
+		for(ISource source : sources) {
 			// determine mime type in order to create proper commons object
 			SupportedType type = MimeGuesser.guess(source);
 			
@@ -84,12 +109,11 @@ public class CommonsConfigurationProducer extends AbstractConfigurationProducer 
 			}
 			
 			// leave on first loop if merge is on
-			if(!annotation.merge()) {
+			if(!wrapper.merge()) {
 				break;
 			}
 		}		
 		// return configuration
 		return combined;
 	}
-	
 }

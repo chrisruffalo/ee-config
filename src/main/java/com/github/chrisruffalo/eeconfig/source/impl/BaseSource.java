@@ -1,9 +1,18 @@
-package com.github.chrisruffalo.eeconfig.resources.configuration.source;
+package com.github.chrisruffalo.eeconfig.source.impl;
 
 import java.io.InputStream;
 
-public abstract class ConfigurationSource implements IConfigurationSource {
-	
+import com.github.chrisruffalo.eeconfig.source.ISource;
+
+/**
+ * Common implementation for sources
+ * 
+ * @author Chris Ruffalo
+ *
+ */
+public abstract class BaseSource implements ISource {
+
+	// the path to the source
 	private String path;
 	
 	/**
@@ -31,6 +40,11 @@ public abstract class ConfigurationSource implements IConfigurationSource {
 		return path;
 	}
 
+	/**
+	 * Set the path of the element
+	 * 
+	 * @param path
+	 */
 	public void setPath(String path) {
 		this.path = path;
 	}
@@ -48,6 +62,14 @@ public abstract class ConfigurationSource implements IConfigurationSource {
 		String ext = this.path.substring(this.path.lastIndexOf('.')+1);
 		// return
 		return ext;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName() + " [available: " + this.available() + "]";
 	}
 	
 }

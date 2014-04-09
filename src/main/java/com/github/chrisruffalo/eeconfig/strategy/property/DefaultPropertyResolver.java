@@ -1,23 +1,36 @@
 package com.github.chrisruffalo.eeconfig.strategy.property;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Default;
-import javax.inject.Singleton;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Default implementation of the property resolver that can
+ * resolve properties by using a given property map combined
+ * with given System Properties
+ * 
+ * @author Chris Ruffalo
+ *
+ */
 @Default
-@Singleton
+@ApplicationScoped
 public class DefaultPropertyResolver implements PropertyResolver {
-
+	
+	// not injected so we can write some "normal" unit tests based around it
 	private Logger logger;
 
+	/**
+	 * Create the default resolver
+	 * 
+	 */
 	public DefaultPropertyResolver() {
 		this.logger = LoggerFactory.getLogger(this.getClass());
 	}
@@ -27,14 +40,22 @@ public class DefaultPropertyResolver implements PropertyResolver {
 	 */
 	@Override
 	public String resolveProperties(String fullString) {
-		return resolveProperties(fullString, new HashMap<String, String>(0));
+		return resolveProperties(fullString, Collections.emptyMap());
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String resolveProperties(String fullString, Map<String, String> additionalProperties) {
+	public String resolveProperties(String fullString, Map<Object, Object> bootstrapProperties) {
+		return resolveProperties(fullString, bootstrapProperties, Collections.emptyMap());
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String resolveProperties(String fullString, Map<Object, Object> bootstrapProperties, Map<Object, Object> defaultProperties) {
 		
 		// prevent loops
 		Set<String> previousValues = new HashSet<String>();
@@ -67,12 +88,14 @@ public class DefaultPropertyResolver implements PropertyResolver {
 					continue;
 				}
 	
-				// get the property
-				final String property;
-				if(additionalProperties != null && additionalProperties.containsKey(token)) {
-					property = additionalProperties.get(token);
-				} else {
+				// get the property (first from bootstrap, then from system properties, then from default)
+				String property = null;
+				if(bootstrapProperties != null && bootstrapProperties.containsKey(token)) {
+					property = String.valueOf(bootstrapProperties.get(token));
+				} else if(System.getProperties().containsKey(token)) {
 					property = System.getProperty(token);
+				} else if(defaultProperties != null && defaultProperties.containsKey(token)) {
+					property = String.valueOf(defaultProperties.get(token));
 				}
 	
 				// if the property is null, leave
@@ -99,7 +122,7 @@ public class DefaultPropertyResolver implements PropertyResolver {
 			// we can consider it safe to return because it's either recursive or
 			// cyclic
 			if(previousValues.contains(output)) {
-				this.logger.warn("Cyclic or recursive property resolution found for '{}', done resolving properties", output);
+				this.logger.trace("Cyclic or recursive property resolution found for '{}', done resolving properties", output);
 				break;
 			}
 			

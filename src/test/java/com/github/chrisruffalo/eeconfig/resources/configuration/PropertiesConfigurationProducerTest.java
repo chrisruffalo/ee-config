@@ -7,12 +7,14 @@ import javax.inject.Inject;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.github.chrisruffalo.eeconfig.annotations.Configuration;
+import com.github.chrisruffalo.eeconfig.annotations.Source;
+import com.github.chrisruffalo.eeconfig.strategy.locator.ResourceLocator;
 import com.github.chrisruffalo.eeconfig.support.DeploymentFactory;
 
 @RunWith(Arquillian.class)
@@ -23,9 +25,8 @@ public class PropertiesConfigurationProducerTest {
 	//private Logger logger;
 	
 	@Deployment
-	public static WebArchive deployment() {
-		WebArchive archive = DeploymentFactory.createDeployment();
-
+	public static JavaArchive deployment() {
+		JavaArchive archive = DeploymentFactory.createDeployment();
 		return archive;
 	}
 	
@@ -36,7 +37,7 @@ public class PropertiesConfigurationProducerTest {
 	 */
 	@Test
 	@Inject
-	public void testEmptyPaths(@Configuration(paths={}) Properties properties) {
+	public void testEmptyPaths(@Configuration Properties properties) {
 		Assert.assertNotNull(properties);
 		Assert.assertTrue(properties.isEmpty());
 	}
@@ -48,7 +49,15 @@ public class PropertiesConfigurationProducerTest {
 	 */
 	@Test
 	@Inject
-	public void testNonexistantPaths(@Configuration(paths={"resource:no/path/here.properties","/bad/path/file.properties"}) Properties properties) {
+	public void testNonexistantPaths(
+		@Configuration(
+			sources={
+				@Source(value="no/path/here.properties"),
+				@Source(value="/bad/path/file.properties")
+			}
+		)
+		Properties properties) 
+	{
 		Assert.assertNotNull(properties);
 		Assert.assertTrue(properties.isEmpty());
 	}
@@ -63,10 +72,10 @@ public class PropertiesConfigurationProducerTest {
 	@Inject
 	//@Ignore
 	public void testNoMergeResources(@Configuration(
-		paths = {
-			"resource:properties/priority1.properties",
-			"resource:properties/priority2.properties",
-			"resource:properties/priority3.properties"
+		sources = {
+			@Source(value="properties/priority1.properties", locator=ResourceLocator.class),
+			@Source(value="properties/priority2.properties", locator=ResourceLocator.class),
+			@Source(value="properties/priority3.properties", locator=ResourceLocator.class),
 		}
 	) Properties properties) {
 		Assert.assertNotNull(properties);
@@ -93,10 +102,10 @@ public class PropertiesConfigurationProducerTest {
 	@Inject
 	//@Ignore
 	public void testNoMergeResourcesWithDifferentOrder(@Configuration(
-		paths = {
-			"resource:properties/priority2.properties",
-			"resource:properties/priority1.properties",
-			"resource:properties/priority3.properties"
+		sources = {
+			@Source(value="properties/priority2.properties", locator=ResourceLocator.class),
+			@Source(value="properties/priority1.properties", locator=ResourceLocator.class),
+			@Source(value="properties/priority3.properties", locator=ResourceLocator.class),
 		}
 	) Properties properties) {
 		Assert.assertNotNull(properties);
@@ -119,10 +128,10 @@ public class PropertiesConfigurationProducerTest {
 	@Inject
 	//@Ignore
 	public void testMergedResources(@Configuration(
-		paths = {
-			"resource:properties/priority1.properties",
-			"resource:properties/priority2.properties",
-			"resource:properties/priority3.properties"
+		sources = {
+			@Source(value="properties/priority1.properties", locator=ResourceLocator.class),
+			@Source(value="properties/priority2.properties", locator=ResourceLocator.class),
+			@Source(value="properties/priority3.properties", locator=ResourceLocator.class),
 		},
 		merge = true
 	) Properties properties) {

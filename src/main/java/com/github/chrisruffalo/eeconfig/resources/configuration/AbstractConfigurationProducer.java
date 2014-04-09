@@ -1,25 +1,29 @@
 package com.github.chrisruffalo.eeconfig.resources.configuration;
 
 
-import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
-import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
-import com.github.chrisruffalo.eeconfig.annotations.AutoLogger;
 import com.github.chrisruffalo.eeconfig.annotations.Configuration;
-import com.github.chrisruffalo.eeconfig.resources.configuration.source.IConfigurationSource;
-import com.github.chrisruffalo.eeconfig.strategy.locator.ConfigurationSourceLocator;
-import com.github.chrisruffalo.eeconfig.strategy.locator.DefaultConfigurationSourceLocator;
-import com.github.chrisruffalo.eeconfig.strategy.property.DefaultPropertyResolver;
+import com.github.chrisruffalo.eeconfig.annotations.Logging;
+import com.github.chrisruffalo.eeconfig.annotations.Source;
+import com.github.chrisruffalo.eeconfig.resources.BeanResolver;
+import com.github.chrisruffalo.eeconfig.resources.ResolverFactory;
+import com.github.chrisruffalo.eeconfig.source.ISource;
+import com.github.chrisruffalo.eeconfig.source.impl.UnfoundSource;
+import com.github.chrisruffalo.eeconfig.strategy.locator.Locator;
+import com.github.chrisruffalo.eeconfig.strategy.locator.NullLocator;
 import com.github.chrisruffalo.eeconfig.strategy.property.PropertyResolver;
+import com.github.chrisruffalo.eeconfig.wrapper.ConfigurationWrapper;
+import com.github.chrisruffalo.eeconfig.wrapper.WrapperFactory;
+import com.github.chrisruffalo.eeconfig.wrapper.ResolverWrapper;
 
 /**
  * Implements shared logic for loading configuration files
@@ -30,11 +34,14 @@ import com.github.chrisruffalo.eeconfig.strategy.property.PropertyResolver;
 public abstract class AbstractConfigurationProducer {
 	
 	@Inject
-	@AutoLogger
+	@Logging
 	private Logger logger;
 	
 	@Inject
-	private BeanManager manager;
+	private ResolverFactory resolverFactory;
+	
+	@Inject
+	private BeanResolver beanResolver;
 	
 	/**
 	 * Utility to get {@link Configuration} annotation from the
@@ -45,9 +52,9 @@ public abstract class AbstractConfigurationProducer {
 	 * 
 	 * @return configuration annotation
 	 */
-	protected Configuration getAnnotation(InjectionPoint injectionPoint) {
+	protected ConfigurationWrapper getConfigurationWrapper(InjectionPoint injectionPoint) {
 		Configuration configuration = injectionPoint.getAnnotated().getAnnotation(Configuration.class);
-		return configuration;
+		return WrapperFactory.wrap(configuration);
 	}
 	
 	/**
@@ -58,74 +65,70 @@ public abstract class AbstractConfigurationProducer {
 	 * 
 	 * @return List of InputStreams representing the configuration found
 	 */
-	protected List<IConfigurationSource> locate(Configuration configuration) {
+	protected List<ISource> locate(ConfigurationWrapper configuration) {
 				
 		if(configuration == null) {
 			throw new IllegalArgumentException("A non-null Configuration annotation must be provided");
 		}
 		
-		ConfigurationSourceLocator locator = null;
-		Class<? extends ConfigurationSourceLocator> sourceLocatorClass = configuration.locator();
-		if(sourceLocatorClass == null) {
-			this.logger.debug("No alternate locator provided, using default");
-			sourceLocatorClass = DefaultConfigurationSourceLocator.class;
-		} else {
-			this.logger.debug("Requesting alternate locator: {}", sourceLocatorClass.getName());
-		} 
-		locator = this.resolveBean(sourceLocatorClass, DefaultConfigurationSourceLocator.class);
-				
-		PropertyResolver resolver = null;
-		Class<? extends PropertyResolver> propertyResolverClass = configuration.propertyResolver();
-		if(propertyResolverClass == null) {
-			this.logger.debug("No alternate property resolver provided, using default");
-			propertyResolverClass = DefaultPropertyResolver.class;
-		} else {
-			this.logger.debug("Requesting alternate property resolver: {}", propertyResolverClass.getName());
-		}
-		resolver = this.resolveBean(propertyResolverClass, DefaultPropertyResolver.class);
-		locator.setPropertyResolver(resolver);
-				
-		// locate through the location source
-		List<IConfigurationSource> sources = locator.locate(configuration);
+		// create resolver from configuration annotation's resolver element
+		ResolverWrapper resolverWrapper = configuration.resolver();
+		PropertyResolver resolver = this.resolverFactory.createPropertyResolver(resolverWrapper);
+		Map<Object,Object> bootstrapMap = this.resolverFactory.getBootstrapProperties(resolverWrapper);
+		Map<Object,Object> defaultMap = this.resolverFactory.getDefaultProperties(resolverWrapper);
 		
-		return sources;
-	}	
-	
+		// found sources
+		List<ISource> foundSources = new ArrayList<ISource>(0);
+		
+		// create sources
+		List<Source> sources = new ArrayList<Source>(Arrays.asList(configuration.sources()));
+		
+		// resolve sources as normal
+		for(Source source : sources) {
+			ISource found = this.resloveSource(source, resolver, bootstrapMap, defaultMap);
+			if(found != null) {
+				foundSources.add(found);
+			}
+		}
+		
+		// fix no sources found, a source SHOULD always be returned
+		if(foundSources.isEmpty()) {
+			foundSources.add(new UnfoundSource());
+		}
+		
+		return foundSources;
+	}
+		
 	/**
-	 * Resolve managed bean for given types
+	 * Resolve a given source from the provided {@link Source} annotation
 	 * 
-	 * @param typeToResolve
-	 * @param defaultType
+	 * @param source
+	 * @param resolver
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
-	private <B, T extends B, D extends B> B resolveBean(Class<T> typeToResolve, Class<D> defaultType) {
-
-		// null request leads to null resolution
-		if(typeToResolve == null) {
-			return null;
+	private ISource resloveSource(Source source, PropertyResolver resolver, Map<Object, Object> bootstrapMap, Map<Object, Object> defaultMap) {
+		Class<? extends Locator> locatorClass = source.locator();
+		if(locatorClass == null) {
+			locatorClass = NullLocator.class;
+		}
+		Locator locator = this.beanResolver.resolveBeanWithDefaultClass(locatorClass, NullLocator.class);
+		this.logger.trace("Using locator: '{}'", locator.getClass().getName());
+		
+		// resolve path if enabled
+		String path = source.value();
+		if(resolver != null && source.resolve()) {
+			path = resolver.resolveProperties(path, bootstrapMap, defaultMap);
 		}
 		
-		Set<Bean<?>> candidates = this.manager.getBeans(typeToResolve);
+		// log path
+		this.logger.trace("Looking for source at path: '{}'", path);
 		
-		// if no candidates are available, resolve
-		// using next class up
-		if(!candidates.iterator().hasNext()) {
-			this.logger.debug("No candidates for: {}", typeToResolve.getName());
-			// try and resolve only the default type
-			return resolveBean(defaultType, null);
-		} 
+		// locate
+		ISource foundSource = locator.locate(path);
 		
-		this.logger.debug("Requesting resolution on: {}", typeToResolve.getName());
-		
-		// get candidate
-		Bean<?> bean = candidates.iterator().next();
-		CreationalContext<?> context = this.manager.createCreationalContext(bean);
-		Type type = (Type) bean.getTypes().iterator().next();
-	    B result = (B)this.manager.getReference(bean, type, context);
-		
-		this.logger.debug("Resolved to: {}", result.getClass().getName());
-		
-		return result;
+		// log results
+		this.logger.trace("Source: '{}' (using locator '{}')", foundSource, locator.getClass().getName());
+		return foundSource;
 	}
+
 }

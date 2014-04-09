@@ -14,9 +14,10 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
-import com.github.chrisruffalo.eeconfig.annotations.AutoLogger;
+import com.github.chrisruffalo.eeconfig.annotations.Logging;
 import com.github.chrisruffalo.eeconfig.annotations.Configuration;
-import com.github.chrisruffalo.eeconfig.resources.configuration.source.IConfigurationSource;
+import com.github.chrisruffalo.eeconfig.source.ISource;
+import com.github.chrisruffalo.eeconfig.wrapper.ConfigurationWrapper;
 
 /**
  * Produces raw InputStreams for implementing custom configuration
@@ -29,41 +30,54 @@ import com.github.chrisruffalo.eeconfig.resources.configuration.source.IConfigur
 public class InputStreamConfigurationProducer extends AbstractConfigurationProducer {
 
 	@Inject
-	@AutoLogger
+	@Logging
 	private Logger logger;
 	
+	/**
+	 * Returns an input stream, the first one found, for a given {@link Configuration}
+	 * 
+	 * @param injectionPoint
+	 * @return
+	 */
 	@Produces
-	@Configuration(paths={})
+	@Configuration
 	public InputStream getInputStream(InjectionPoint injectionPoint) {
-		// get configuration annotation
-		Configuration annotation = this.getAnnotation(injectionPoint);
+		// get configuration instance
+		ConfigurationWrapper wrapper = this.getConfigurationWrapper(injectionPoint);
 		
 		// get input streams
-		List<IConfigurationSource> sources = this.locate(annotation);
+		List<ISource> sources = this.locate(wrapper);
 		
-		// return the first stream
-		return sources.get(0).stream();
+		// return first available source
+		for(ISource source : sources) {
+			if(source.available()) {
+				return source.stream();
+			}
+		}
+		
+		// otherwise just return the first stream
+		return sources.get(0).stream();	
 	}
 	
 	@Produces
-	@Configuration(paths={})
+	@Configuration
 	public List<InputStream> getInputStreams(InjectionPoint injectionPoint) {
-		// get configuration annotation
-		Configuration annotation = this.getAnnotation(injectionPoint);
+		// get configuration instance
+		ConfigurationWrapper wrapper = this.getConfigurationWrapper(injectionPoint);
 		
-		// get sources
-		List<IConfigurationSource> sources = this.locate(annotation);
+		// get input streams
+		List<ISource> sources = this.locate(wrapper);
 		
 		// get input streams
 		List<InputStream> streams = new ArrayList<InputStream>(sources.size());
 		
 		// go through the sources and add them
-		for(IConfigurationSource source : sources) {
+		for(ISource source : sources) {
 			if(!source.available()) {
-				this.logger.info("Source is not available: {}", source.getPath());
+				this.logger.trace("Source is not available: {}", source.getPath());
 				continue;
 			}
-			this.logger.info("Source available: {}", source.getPath());
+			this.logger.trace("Source available: {}", source.getPath());
 			streams.add(source.stream());
 		}
 		

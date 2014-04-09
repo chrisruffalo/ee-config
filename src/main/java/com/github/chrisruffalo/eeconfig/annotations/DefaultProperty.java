@@ -9,17 +9,18 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import javax.inject.Qualifier;
-
 /**
- * Used to qualify provided SLF4J logger
+ * Allows in-source definition of properties
  * 
  * @author Chris Ruffalo
- * 
+ *
  */
-@Qualifier
 @Retention(RUNTIME)
 @Target({ METHOD, FIELD, PARAMETER, TYPE })
-public @interface AutoLogger {
+public @interface DefaultProperty {
 
+	String key();
+	
+	String value();
+	
 }

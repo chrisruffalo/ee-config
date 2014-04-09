@@ -33,7 +33,7 @@ public class DefaultPropertyResolverTest {
 	 */
 	@Test
 	public void testSeededResolution() {
-		Map<String, String> seeds = new HashMap<String, String>();
+		Map<Object, Object> seeds = new HashMap<Object, Object>();
 		seeds.put("token1", "value1");
 		seeds.put("token2", "value2");
 		
@@ -49,7 +49,7 @@ public class DefaultPropertyResolverTest {
 	 */
 	@Test
 	public void testMultiStepResolution() {
-		Map<String, String> seeds = new HashMap<String, String>();
+		Map<Object, Object> seeds = new HashMap<Object, Object>();
 		seeds.put("token1", "${token2}-${token3}");
 		seeds.put("token2", "value2");
 		seeds.put("token3", "${token4}");
@@ -68,7 +68,7 @@ public class DefaultPropertyResolverTest {
 	 */
 	@Test
 	public void testRecursiveResolution() {
-		Map<String, String> seeds = new HashMap<String, String>();
+		Map<Object, Object> seeds = new HashMap<Object, Object>();
 		seeds.put("token1", "${token1}");
 		
 		PropertyResolver resolver = new DefaultPropertyResolver();
@@ -85,7 +85,7 @@ public class DefaultPropertyResolverTest {
 	 */
 	@Test
 	public void testCyclicResolution() {
-		Map<String, String> seeds = new HashMap<String, String>();
+		Map<Object, Object> seeds = new HashMap<Object, Object>();
 		seeds.put("token1", "${token2}");
 		seeds.put("token2", "${token3}");
 		seeds.put("token3", "${token1}");

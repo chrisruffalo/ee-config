@@ -1,4 +1,4 @@
-package com.github.chrisruffalo.eeconfig.resources.configuration.source;
+package com.github.chrisruffalo.eeconfig.source.impl;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -7,14 +7,28 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
-public class FileConfigurationSource extends ConfigurationSource {
+/**
+ * Configuration source based on {@link File}
+ * 
+ * @author Chris Ruffalo
+ */
+public class FileSource extends BaseSource {
 
+	// file holder/marker
 	private File file;
 	
-	public FileConfigurationSource(File file) {
+	/**
+	 * Create a new FileSource from a File
+	 * 
+	 * @param file
+	 */
+	public FileSource(File file) {
 		this.file = file;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public InputStream stream() {
 		InputStream stream;
@@ -30,13 +44,11 @@ public class FileConfigurationSource extends ConfigurationSource {
 		return stream;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean available() {
 		return file != null && file.exists() && file.isFile();
 	}
-
-	public File getFile() {
-		return this.file;
-	}
-
 }

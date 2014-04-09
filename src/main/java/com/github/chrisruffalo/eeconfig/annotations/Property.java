@@ -4,9 +4,11 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.ElementType.TYPE;
-import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+
 import javax.enterprise.util.Nonbinding;
 import javax.inject.Qualifier;
 
@@ -21,7 +23,7 @@ import javax.inject.Qualifier;
 @Qualifier
 @Retention(RUNTIME)
 @Target({ METHOD, FIELD, PARAMETER, TYPE })
-public @interface SystemProperty {
+public @interface Property {
 
 	/**
 	 * The key to use to look up the system property
@@ -31,7 +33,7 @@ public @interface SystemProperty {
 	 * 		   property
 	 */
 	@Nonbinding
-	String key();
+	String value();
 	
 	/**
 	 * The value to use if the system property is null
@@ -40,5 +42,13 @@ public @interface SystemProperty {
 	 */
 	@Nonbinding
 	String defaultValue() default "";
+	
+	/**
+	 * The resolver to use when finding the value of the property
+	 * 
+	 * @return
+	 */
+	@Nonbinding
+	Resolver resolver() default @Resolver();
 	
 }
