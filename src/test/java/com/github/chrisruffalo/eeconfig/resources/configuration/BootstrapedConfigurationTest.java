@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.github.chrisruffalo.eeconfig.annotations.Bootstrap;
-import com.github.chrisruffalo.eeconfig.annotations.Configuration;
+import com.github.chrisruffalo.eeconfig.annotations.EEConfiguration;
 import com.github.chrisruffalo.eeconfig.annotations.DefaultProperty;
 import com.github.chrisruffalo.eeconfig.annotations.Resolver;
 import com.github.chrisruffalo.eeconfig.annotations.Source;
@@ -28,7 +28,7 @@ public class BootstrapedConfigurationTest {
 	@Test
 	@Inject
 	public void testBootstrappedConfiguration(			
-		@Configuration(
+		@EEConfiguration(
 			sources={
 				@Source(value="resource:${propertiesPath}/${file}1.${extension}", resolve = true),
 				@Source(value="resource:${propertiesPath}/${file}2.${extension}", resolve = true),
@@ -61,7 +61,7 @@ public class BootstrapedConfigurationTest {
 	@Test
 	@Inject
 	public void testThatDefaultPropertiesDontMessItUp(			
-		@Configuration(
+		@EEConfiguration(
 			sources={
 				@Source(value="resource:${propertiesPath}/${file}1.${extension}", resolve = true),
 				@Source(value="resource:${propertiesPath}/${file}2.${extension}", resolve = true),

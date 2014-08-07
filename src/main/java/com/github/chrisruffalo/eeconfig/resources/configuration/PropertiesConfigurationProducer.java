@@ -15,15 +15,15 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
-import com.github.chrisruffalo.eeconfig.annotations.Logging;
-import com.github.chrisruffalo.eeconfig.annotations.Configuration;
+import com.github.chrisruffalo.eeconfig.annotations.EELogging;
+import com.github.chrisruffalo.eeconfig.annotations.EEConfiguration;
 import com.github.chrisruffalo.eeconfig.mime.MimeGuesser;
 import com.github.chrisruffalo.eeconfig.mime.SupportedType;
 import com.github.chrisruffalo.eeconfig.source.ISource;
 import com.github.chrisruffalo.eeconfig.wrapper.ConfigurationWrapper;
 
 /**
- * Resolves the {@link Configuration} annotation for injection
+ * Resolves the {@link EEConfiguration} annotation for injection
  * into the target project.
  * 
  * @author Chris Ruffalo
@@ -33,7 +33,7 @@ import com.github.chrisruffalo.eeconfig.wrapper.ConfigurationWrapper;
 public class PropertiesConfigurationProducer extends AbstractConfigurationProducer {
 	
 	@Inject
-	@Logging
+	@EELogging
 	private Logger logger;
 	
 	/**
@@ -45,7 +45,7 @@ public class PropertiesConfigurationProducer extends AbstractConfigurationProduc
 	 * 		   configuration files (if found)
 	 */
 	@Produces
-	@Configuration
+	@EEConfiguration
 	public Properties getProperties(InjectionPoint injectionPoint) {
 		// properties should be stored here
 		Properties properties = new Properties();

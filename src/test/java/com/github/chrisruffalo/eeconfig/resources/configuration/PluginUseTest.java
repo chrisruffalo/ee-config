@@ -11,7 +11,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.github.chrisruffalo.eeconfig.annotations.Configuration;
+import com.github.chrisruffalo.eeconfig.annotations.EEConfiguration;
 import com.github.chrisruffalo.eeconfig.annotations.Resolver;
 import com.github.chrisruffalo.eeconfig.annotations.Source;
 import com.github.chrisruffalo.eeconfig.resources.configuration.extensions.DummySource;
@@ -39,7 +39,7 @@ public class PluginUseTest {
 	 */
 	@Test
 	@Inject
-	public void testPropertyResolverPlugin(@Configuration(
+	public void testPropertyResolverPlugin(@EEConfiguration(
 		sources={
 			@Source(value="${java.io.tmpdir}/priority2.properties", resolve=true),
 			@Source(value="${java.io.tmpdir}/priority1.properties", resolve=true),
@@ -57,7 +57,7 @@ public class PluginUseTest {
 	 */
 	@Test
 	@Inject
-	public void testPropertyResolverPluginWithOneResolve(@Configuration(
+	public void testPropertyResolverPluginWithOneResolve(@EEConfiguration(
 		sources = {
 			@Source(value="${java.io.tmpdir}/priority2.properties", resolve=true),
 			@Source(value="${java.io.tmpdir}/priority1.properties", resolve=false),
@@ -75,7 +75,7 @@ public class PluginUseTest {
 	 */
 	@Test
 	@Inject
-	public void testLocatorPlugin(@Configuration(
+	public void testLocatorPlugin(@EEConfiguration(
 		sources = {
 			@Source(value="properties/priority1.properties", locator=SharedTestSourceLocator.class),
 			@Source(value="properties/priority2.properties", locator=SharedTestSourceLocator.class),

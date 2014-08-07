@@ -13,7 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.github.chrisruffalo.eeconfig.annotations.Bootstrap;
-import com.github.chrisruffalo.eeconfig.annotations.Logging;
+import com.github.chrisruffalo.eeconfig.annotations.EELogging;
 import com.github.chrisruffalo.eeconfig.annotations.DefaultProperty;
 import com.github.chrisruffalo.eeconfig.annotations.Resolver;
 import com.github.chrisruffalo.eeconfig.annotations.Source;
@@ -36,20 +36,20 @@ public class JavaLoggingProducerTest {
 
 	@Test
 	@Inject
-	public void testClassInjection(@Logging Logger logger) {
+	public void testClassInjection(@EELogging Logger logger) {
 		Assert.assertEquals(this.getClass().getName(), logger.getName());
 	}
 	
 	@Test
 	@Inject
-	public void testNameInjection(@Logging(name="testLogger") Logger logger) {
+	public void testNameInjection(@EELogging(name="testLogger") Logger logger) {
 		Assert.assertEquals("testLogger", logger.getName());
 	}
 	
 	@Test
 	@Inject
 	public void testResolvedInjection(
-		@Logging(name="${rootLogger}-${local}-${loggerExt}", resolver = 
+		@EELogging(name="${rootLogger}-${local}-${loggerExt}", resolver = 
 			@Resolver(
 				bootstrap=@Bootstrap(
 					sources=@Source("resource:properties/bootstrap.properties")

@@ -11,13 +11,13 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
-import com.github.chrisruffalo.eeconfig.annotations.Logging;
+import com.github.chrisruffalo.eeconfig.annotations.EELogging;
 
 @ApplicationScoped
 public class BeanResolver {
 
 	@Inject
-	@Logging
+	@EELogging
 	private Logger logger;
 	
 	@Inject

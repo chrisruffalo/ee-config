@@ -11,7 +11,7 @@ import javax.inject.Inject;
 import org.apache.commons.configuration.ConfigurationMap;
 import org.slf4j.Logger;
 
-import com.github.chrisruffalo.eeconfig.annotations.Logging;
+import com.github.chrisruffalo.eeconfig.annotations.EELogging;
 import com.github.chrisruffalo.eeconfig.annotations.DefaultProperty;
 import com.github.chrisruffalo.eeconfig.annotations.Resolver;
 import com.github.chrisruffalo.eeconfig.resources.configuration.CommonsConfigurationProducer;
@@ -25,7 +25,7 @@ import com.github.chrisruffalo.eeconfig.wrapper.ResolverWrapper;
 public class ResolverFactory {
 
 	@Inject
-	@Logging
+	@EELogging
 	private Logger logger;
 	
 	@Inject

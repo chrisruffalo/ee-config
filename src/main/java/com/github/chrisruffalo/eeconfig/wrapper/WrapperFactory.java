@@ -1,10 +1,10 @@
 package com.github.chrisruffalo.eeconfig.wrapper;
 
 import com.github.chrisruffalo.eeconfig.annotations.Bootstrap;
-import com.github.chrisruffalo.eeconfig.annotations.Configuration;
+import com.github.chrisruffalo.eeconfig.annotations.EEConfiguration;
 
 /**
- * Create the correct wrapper for {@link Bootstrap} and {@link Configuration}
+ * Create the correct wrapper for {@link Bootstrap} and {@link EEConfiguration}
  * annotations
  * 
  * @author Chris Ruffalo
@@ -18,7 +18,7 @@ public final class WrapperFactory {
 	}
 	
 	/**
-	 * Wrap a {@link Bootstrap} or {@link Configuration} element
+	 * Wrap a {@link Bootstrap} or {@link EEConfiguration} element
 	 * in another class so that they are compatible with the
 	 * same methods
 	 * 
@@ -34,8 +34,8 @@ public final class WrapperFactory {
 		// wrap one of the two types
 		if(toWrap instanceof Bootstrap) {
 			return new BootstrapAnnotationWrapper((Bootstrap)toWrap);
-		} else if(toWrap instanceof Configuration) {
-			return new ConfigurationAnnotationWrapper((Configuration)toWrap);
+		} else if(toWrap instanceof EEConfiguration) {
+			return new ConfigurationAnnotationWrapper((EEConfiguration)toWrap);
 		}
 		
 		// should not get here

@@ -6,14 +6,14 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 
-import com.github.chrisruffalo.eeconfig.annotations.Configuration;
+import com.github.chrisruffalo.eeconfig.annotations.EEConfiguration;
 import com.github.chrisruffalo.eeconfig.source.ISource;
 import com.github.chrisruffalo.eeconfig.wrapper.ConfigurationWrapper;
 
 
 /**
  * Returns raw configuration source ({@link ISource}) resources as loaded
- * from the paths specified in the {@link Configuration} annotation.
+ * from the paths specified in the {@link EEConfiguration} annotation.
  * 
  * @author Chris Ruffalo
  *
@@ -29,7 +29,7 @@ public class RawConfigurationSourceProducer extends AbstractConfigurationProduce
 	 * @return the raw configuration sources found for the given paths
 	 */
 	@Produces
-	@Configuration
+	@EEConfiguration
 	public List<ISource> getProperties(InjectionPoint injectionPoint) {
 		// get configuration instance
 		ConfigurationWrapper wrapper = this.getConfigurationWrapper(injectionPoint);

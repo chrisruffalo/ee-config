@@ -1,10 +1,10 @@
 package com.github.chrisruffalo.eeconfig.wrapper;
 
-import com.github.chrisruffalo.eeconfig.annotations.Configuration;
+import com.github.chrisruffalo.eeconfig.annotations.EEConfiguration;
 import com.github.chrisruffalo.eeconfig.annotations.Source;
 
 /**
- * Compatibility wrapper for a {@link Configuration} annotation
+ * Compatibility wrapper for a {@link EEConfiguration} annotation
  * 
  * @author Chris Ruffalo
  *
@@ -12,14 +12,14 @@ import com.github.chrisruffalo.eeconfig.annotations.Source;
 public class ConfigurationAnnotationWrapper implements ConfigurationWrapper {
 
 	// local delegate
-	private Configuration delegate;
+	private EEConfiguration delegate;
 	
 	/**
-	 * Wraps a given {@link Configuration} annotation
+	 * Wraps a given {@link EEConfiguration} annotation
 	 * 
 	 * @param toWrap
 	 */
-	public ConfigurationAnnotationWrapper(Configuration toWrap) {
+	public ConfigurationAnnotationWrapper(EEConfiguration toWrap) {
 		this.delegate = toWrap;
 	}
 	

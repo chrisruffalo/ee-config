@@ -24,7 +24,7 @@ import javax.inject.Qualifier;
 @Qualifier
 @Retention(RUNTIME)
 @Target({ METHOD, FIELD, PARAMETER, TYPE })
-public @interface Configuration {
+public @interface EEConfiguration {
 	
 	/**
 	 * List of configuration sources that should be used to create

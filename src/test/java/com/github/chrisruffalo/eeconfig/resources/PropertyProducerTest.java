@@ -1,6 +1,8 @@
 package com.github.chrisruffalo.eeconfig.resources;
 
 
+import java.nio.file.Path;
+
 import javax.inject.Inject;
 
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -75,6 +77,19 @@ public class PropertyProducerTest {
 		Assert.assertFalse(property.isEmpty());
 		Assert.assertFalse("dir".equals(property));
 	}
+	
+	/**
+     * Test the Path injection from Property
+     * 
+     * @param path
+     */
+    @Test
+    @Inject
+    public void testTmpDirPath(@Property(value="${java.io.tmpdir}") Path path) {
+        Assert.assertNotNull(path);
+        Assert.assertFalse(path.toString().isEmpty());
+        Assert.assertFalse("/".equals(path.toString()));
+    }
 	
 	/**
 	 * Test that the default value will come into play if a 

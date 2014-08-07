@@ -11,8 +11,8 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
-import com.github.chrisruffalo.eeconfig.annotations.Configuration;
-import com.github.chrisruffalo.eeconfig.annotations.Logging;
+import com.github.chrisruffalo.eeconfig.annotations.EEConfiguration;
+import com.github.chrisruffalo.eeconfig.annotations.EELogging;
 import com.github.chrisruffalo.eeconfig.annotations.Source;
 import com.github.chrisruffalo.eeconfig.resources.BeanResolver;
 import com.github.chrisruffalo.eeconfig.resources.ResolverFactory;
@@ -34,7 +34,7 @@ import com.github.chrisruffalo.eeconfig.wrapper.ResolverWrapper;
 public abstract class AbstractConfigurationProducer {
 	
 	@Inject
-	@Logging
+	@EELogging
 	private Logger logger;
 	
 	@Inject
@@ -44,7 +44,7 @@ public abstract class AbstractConfigurationProducer {
 	private BeanResolver beanResolver;
 	
 	/**
-	 * Utility to get {@link Configuration} annotation from the
+	 * Utility to get {@link EEConfiguration} annotation from the
 	 * injection point with minimal effort
 	 * 
 	 * @param injectionPoint the injection point that was used
@@ -53,12 +53,12 @@ public abstract class AbstractConfigurationProducer {
 	 * @return configuration annotation
 	 */
 	protected ConfigurationWrapper getConfigurationWrapper(InjectionPoint injectionPoint) {
-		Configuration configuration = injectionPoint.getAnnotated().getAnnotation(Configuration.class);
+		EEConfiguration configuration = injectionPoint.getAnnotated().getAnnotation(EEConfiguration.class);
 		return WrapperFactory.wrap(configuration);
 	}
 	
 	/**
-	 * Breaks down the {@link Configuration} annotation into
+	 * Breaks down the {@link EEConfiguration} annotation into
 	 * the segments to look for configuration files
 	 * 
 	 * @param configuration annotation to use to find configuration files

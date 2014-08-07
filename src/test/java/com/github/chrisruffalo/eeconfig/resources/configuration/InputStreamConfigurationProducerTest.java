@@ -16,7 +16,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.github.chrisruffalo.eeconfig.annotations.Configuration;
+import com.github.chrisruffalo.eeconfig.annotations.EEConfiguration;
 import com.github.chrisruffalo.eeconfig.annotations.Source;
 import com.github.chrisruffalo.eeconfig.strategy.locator.ResourceLocator;
 import com.github.chrisruffalo.eeconfig.support.DeploymentFactory;
@@ -38,7 +38,7 @@ public class InputStreamConfigurationProducerTest {
 	 */
 	@Test
 	@Inject
-	public void testEmptyPaths(@Configuration InputStream stream) throws IOException {
+	public void testEmptyPaths(@EEConfiguration InputStream stream) throws IOException {
 		Assert.assertNotNull(stream);
 		Assert.assertEquals(0, stream.available());
 	}
@@ -52,7 +52,7 @@ public class InputStreamConfigurationProducerTest {
 	@Test
 	@Inject
 	public void testNonexistantPaths(
-		@Configuration(
+		@EEConfiguration(
 			sources={
 				@Source(value="no/path/here.properties"),
 				@Source(value="/bad/path/file.properties")
@@ -75,11 +75,11 @@ public class InputStreamConfigurationProducerTest {
 	@Test
 	@Inject
 	public void testStreamCanBeLoaded(
-		@Configuration(
+		@EEConfiguration(
 			sources=@Source(value="properties/priority1.properties", locator=ResourceLocator.class) 
 		) 
 		InputStream stream,
-		@Configuration(
+		@EEConfiguration(
 			sources=@Source(value="properties/priority1.properties", locator=ResourceLocator.class)
 		) 
 		Properties properties
@@ -113,7 +113,7 @@ public class InputStreamConfigurationProducerTest {
 	 */
 	@Test
 	@Inject
-	public void loadInputStreams(@Configuration(
+	public void loadInputStreams(@EEConfiguration(
 		sources = {
 			@Source(value="properties/priority1.properties", locator=ResourceLocator.class),
 			@Source(value="properties/priority2.properties", locator=ResourceLocator.class),

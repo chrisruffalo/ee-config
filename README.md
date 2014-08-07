@@ -19,7 +19,7 @@ Sadly, I don't want to code everything from scratch, so the EE-Config library re
 
 It also requires 
 
-* SLF4J 1.6.1
+* SLF4J 1.7.x
 * Apache Commons Configuration 1.9
 * Apache Commons Utilities 1.9
 
@@ -49,7 +49,7 @@ The project 'ee-config' has been in maven central since version 1.0.
 
 ### Logging
 
-Because we find it useful and because I use it all the time this library includes a method injecting a logger.  The '@Logging' qualifier is used so that the included Logger producer can easily be ignored or overridden.
+Because we find it useful and because I use it all the time this library includes a method injecting a logger.  The '@EELogging' qualifier is used so that the included Logger producer can easily be ignored or overridden.
 
 EE-Config supports the following types of logging:
  * SLF4J
@@ -59,11 +59,11 @@ EE-Config supports the following types of logging:
 public class INeedALogger {
 	
 	@Inject
-	@Logging
+	@EELogging
 	private Logger logger;
 	
 	@Inject
-    @Logging("named-logger")
+    @EELogging("named-logger")
     private Logger namedLogger;
 	
 	@PostConstruct
@@ -90,6 +90,10 @@ public class INeedSystemProperties {
 	@Inject
 	@Property(value="${java.io.tmpdir}", defaultValue="${application.tmp.dir}")
 	private String tmpDirPath;
+
+    @Inject
+    @Property(value="${java.io.tmpdir}", defaultValue="${application.tmp.dir}")
+    private Path pathToTmp; // injects a Path object that points to the tmp dir directly
 
 	@Inject
 	@Property(
@@ -159,19 +163,20 @@ The Commons Configuraiton supports the following subtypes:
 
 * PropertiesConfiguration
 * XMLConfiguraiton
+* HierarchicalINIConfiguration
 
 No other types or subtypes are implemented yet.  *(To request other types, jump over to the issues page!)*
 
 ### Examples
 
-It might be nice if we just shut up and showed you how to use it.  Below you'll see some examples that use the @Configuration annotation.  The annotation is from the package 'com.github.chrisruffalo.eeconfig.annotations'.
+It might be nice if we just shut up and showed you how to use it.  Below you'll see some examples that use the `@EEConfiguration` annotation.  The annotation is from the package 'com.github.chrisruffalo.eeconfig.annotations'.
 
 #### Example Java Properties
 
 ``` java
 public class ConfigureMeWithProperties {
 	@Inject
-	@Configuration(
+	@EEConfiguration(
 		sources = {
 			// main configuration
 			@Source(
@@ -196,7 +201,7 @@ If merge was not set or set to false then **only** the values of the first confi
 ``` java
 public class ConfigureMeWithCommonConfiguration {
 	@Inject
-	@Configuration(
+	@EEConfiguration(
 		sources = {
 		    // main configuration
 			@Source(
@@ -208,7 +213,7 @@ public class ConfigureMeWithCommonConfiguration {
 		},
 		merge = true // merges results
 	)
-	private org.apache.commons.configuration.Configuration config; 
+	private Configuration config; 
 }
 ```
 
@@ -221,7 +226,7 @@ Say that you *don't* need a fancy configuration object and you'd like to do some
 ``` java
 public class ConfigureMeAnInputStream {
 	@Inject
-	@Configuration(
+	@EEConfiguration(
 		sources = {
 			// main configuration
             @Source(
@@ -256,7 +261,7 @@ So, let's say you want to go one step farther and implement your own merge behav
 ``` java
 public class ConfigureMeAnInputStreamList {
 	@Inject
-	@Configuration(
+	@EEConfiguration(
 		sources = {
 		    // main configuration
 			@Source(
@@ -291,7 +296,7 @@ For something a little more advanced you can inject [ISource](src/main/java/com/
 ``` java
 public class ConfigureFromRawSources {
 	@Inject
-	@Configuration(
+	@EEConfiguration(
 		sources = {
 		    // main configuration
 			@Source(
@@ -338,7 +343,7 @@ public class MyCustomConfigurationProducer extends AbstractConfigurationProducer
 	private Logger logger;
 	
 	@Produces
-	@Configuration(paths={})
+	@EEConfiguration(paths={})
 	public MyCustomConfigurationType getConfiguration(InjectionPoint injectionPoint) {
 		// first use a utility method to get configuration annotation from the injection point
 		Configuration annotation = this.getAnnotation(injectionPoint);
@@ -390,7 +395,7 @@ Let's say you *do* want some form of custom resolution.
 ``` java
 public class ConfigureMeWithCustomBehavior {
 	@Inject
-	@Configuration(
+	@EEConfiguration(
 	    // main configuration
 		sources = {
 			@Source(

@@ -12,7 +12,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.github.chrisruffalo.eeconfig.annotations.Configuration;
+import com.github.chrisruffalo.eeconfig.annotations.EEConfiguration;
 import com.github.chrisruffalo.eeconfig.annotations.Source;
 import com.github.chrisruffalo.eeconfig.strategy.locator.ResourceLocator;
 import com.github.chrisruffalo.eeconfig.support.DeploymentFactory;
@@ -37,7 +37,7 @@ public class PropertiesConfigurationProducerTest {
 	 */
 	@Test
 	@Inject
-	public void testEmptyPaths(@Configuration Properties properties) {
+	public void testEmptyPaths(@EEConfiguration Properties properties) {
 		Assert.assertNotNull(properties);
 		Assert.assertTrue(properties.isEmpty());
 	}
@@ -50,7 +50,7 @@ public class PropertiesConfigurationProducerTest {
 	@Test
 	@Inject
 	public void testNonexistantPaths(
-		@Configuration(
+		@EEConfiguration(
 			sources={
 				@Source(value="no/path/here.properties"),
 				@Source(value="/bad/path/file.properties")
@@ -71,7 +71,7 @@ public class PropertiesConfigurationProducerTest {
 	@Test
 	@Inject
 	//@Ignore
-	public void testNoMergeResources(@Configuration(
+	public void testNoMergeResources(@EEConfiguration(
 		sources = {
 			@Source(value="properties/priority1.properties", locator=ResourceLocator.class),
 			@Source(value="properties/priority2.properties", locator=ResourceLocator.class),
@@ -101,7 +101,7 @@ public class PropertiesConfigurationProducerTest {
 	@Test
 	@Inject
 	//@Ignore
-	public void testNoMergeResourcesWithDifferentOrder(@Configuration(
+	public void testNoMergeResourcesWithDifferentOrder(@EEConfiguration(
 		sources = {
 			@Source(value="properties/priority2.properties", locator=ResourceLocator.class),
 			@Source(value="properties/priority1.properties", locator=ResourceLocator.class),
@@ -127,7 +127,7 @@ public class PropertiesConfigurationProducerTest {
 	@Test
 	@Inject
 	//@Ignore
-	public void testMergedResources(@Configuration(
+	public void testMergedResources(@EEConfiguration(
 		sources = {
 			@Source(value="properties/priority1.properties", locator=ResourceLocator.class),
 			@Source(value="properties/priority2.properties", locator=ResourceLocator.class),

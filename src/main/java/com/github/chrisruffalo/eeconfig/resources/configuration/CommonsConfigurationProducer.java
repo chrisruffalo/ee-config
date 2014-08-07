@@ -20,8 +20,8 @@ import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.configuration.tree.OverrideCombiner;
 import org.slf4j.Logger;
 
-import com.github.chrisruffalo.eeconfig.annotations.Configuration;
-import com.github.chrisruffalo.eeconfig.annotations.Logging;
+import com.github.chrisruffalo.eeconfig.annotations.EEConfiguration;
+import com.github.chrisruffalo.eeconfig.annotations.EELogging;
 import com.github.chrisruffalo.eeconfig.mime.MimeGuesser;
 import com.github.chrisruffalo.eeconfig.mime.SupportedType;
 import com.github.chrisruffalo.eeconfig.source.ISource;
@@ -38,7 +38,7 @@ import com.github.chrisruffalo.eeconfig.wrapper.ConfigurationWrapper;
 public class CommonsConfigurationProducer extends AbstractConfigurationProducer {
 
 	@Inject
-	@Logging
+	@EELogging
 	private Logger logger;
 	
 	/**
@@ -48,7 +48,7 @@ public class CommonsConfigurationProducer extends AbstractConfigurationProducer 
 	 * @return
 	 */
 	@Produces
-	@Configuration
+	@EEConfiguration
 	public org.apache.commons.configuration.Configuration getConfiguration(InjectionPoint injectionPoint) {
 		// get configuration annotation
 		ConfigurationWrapper annotation = this.getConfigurationWrapper(injectionPoint);

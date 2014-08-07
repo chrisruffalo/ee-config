@@ -10,7 +10,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.chrisruffalo.eeconfig.annotations.Logging;
+import com.github.chrisruffalo.eeconfig.annotations.EELogging;
 import com.github.chrisruffalo.eeconfig.annotations.Resolver;
 import com.github.chrisruffalo.eeconfig.resources.ResolverFactory;
 import com.github.chrisruffalo.eeconfig.strategy.property.PropertyResolver;
@@ -37,10 +37,10 @@ public class SLF4JProducer {
 	 * @return Logger for the Class
 	 */
 	@Produces
-	@Logging
+	@EELogging
 	public Logger createLogger(InjectionPoint injectionPoint) {
 		// the annotation should not be null as it is a qualifier for this producer
-		Logging annotation = injectionPoint.getAnnotated().getAnnotation(Logging.class);
+		EELogging annotation = injectionPoint.getAnnotated().getAnnotation(EELogging.class);
 		
 		// get the logger name
 		String name = annotation.name();

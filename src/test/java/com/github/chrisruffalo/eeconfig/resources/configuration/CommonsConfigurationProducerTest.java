@@ -19,7 +19,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.github.chrisruffalo.eeconfig.annotations.Configuration;
+import com.github.chrisruffalo.eeconfig.annotations.EEConfiguration;
 import com.github.chrisruffalo.eeconfig.annotations.Source;
 import com.github.chrisruffalo.eeconfig.strategy.locator.ResourceLocator;
 import com.github.chrisruffalo.eeconfig.support.DeploymentFactory;
@@ -103,7 +103,7 @@ public class CommonsConfigurationProducerTest {
 	 */
 	@Test
 	@Inject
-	public void testEmptyPaths(@Configuration org.apache.commons.configuration.Configuration properties) {
+	public void testEmptyPaths(@EEConfiguration org.apache.commons.configuration.Configuration properties) {
 		Assert.assertNotNull(properties);
 		Assert.assertTrue(properties.isEmpty());
 	}
@@ -116,7 +116,7 @@ public class CommonsConfigurationProducerTest {
 	@Test
 	@Inject
 	public void testNonexistantPaths(
-			@Configuration(
+			@EEConfiguration(
 				sources={
 					@Source(value="no/path/here.properties", locator=ResourceLocator.class),
 					@Source(value="resource:/bad/path/file.properties")
@@ -137,7 +137,7 @@ public class CommonsConfigurationProducerTest {
 	@Test
 	@Inject
 	public void testNoMergeResources(			
-		@Configuration(
+		@EEConfiguration(
 			sources={
 				@Source(value="resource:properties/priority1.properties"),
 				@Source(value="resource:properties/priority2.properties"),
@@ -169,7 +169,7 @@ public class CommonsConfigurationProducerTest {
 	@Test
 	@Inject
 	public void testNoMergeResourcesWithDifferentOrder(			
-		@Configuration(
+		@EEConfiguration(
 			sources={
 				@Source(value="resource:properties/priority2.properties"),
 				@Source(value="resource:properties/priority1.properties"),
@@ -197,7 +197,7 @@ public class CommonsConfigurationProducerTest {
 	@Test
 	@Inject
 	public void testMergedResources(		
-		@Configuration(
+		@EEConfiguration(
 			sources = {
 				@Source(value="resource:properties/priority1.properties"),
 				@Source(value="resource:properties/priority2.properties"),
@@ -233,7 +233,7 @@ public class CommonsConfigurationProducerTest {
 	@Test
 	@Inject
 	public void testMergeFilesWithSystemPropertiesAndMixedResource(		
-		@Configuration(
+		@EEConfiguration(
 			sources = {
 				@Source(value="${java.io.tmpdir}/priority2.properties", resolve=true),
 				@Source(value="${java.io.tmpdir}/priority1.properties", resolve=true),
@@ -265,7 +265,7 @@ public class CommonsConfigurationProducerTest {
 	@Test
 	@Inject
 	public void testMergeFilesWithoutSystemPropertiesAndMixedResource(
-		@Configuration(
+		@EEConfiguration(
 			sources = {
 				@Source(value="${java.io.tmpdir}/priority2.properties", resolve=false),
 				@Source(value="${java.io.tmpdir}/priority1.properties", resolve=false),
@@ -295,7 +295,7 @@ public class CommonsConfigurationProducerTest {
     @Test
     @Inject
     public void testIni(           
-        @Configuration(
+        @EEConfiguration(
             sources={
                 @Source(value="resource:ini/tree.ini"),
             }

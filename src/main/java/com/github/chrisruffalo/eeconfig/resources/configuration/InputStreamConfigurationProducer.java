@@ -14,8 +14,8 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
-import com.github.chrisruffalo.eeconfig.annotations.Logging;
-import com.github.chrisruffalo.eeconfig.annotations.Configuration;
+import com.github.chrisruffalo.eeconfig.annotations.EELogging;
+import com.github.chrisruffalo.eeconfig.annotations.EEConfiguration;
 import com.github.chrisruffalo.eeconfig.source.ISource;
 import com.github.chrisruffalo.eeconfig.wrapper.ConfigurationWrapper;
 
@@ -30,17 +30,17 @@ import com.github.chrisruffalo.eeconfig.wrapper.ConfigurationWrapper;
 public class InputStreamConfigurationProducer extends AbstractConfigurationProducer {
 
 	@Inject
-	@Logging
+	@EELogging
 	private Logger logger;
 	
 	/**
-	 * Returns an input stream, the first one found, for a given {@link Configuration}
+	 * Returns an input stream, the first one found, for a given {@link EEConfiguration}
 	 * 
 	 * @param injectionPoint
 	 * @return
 	 */
 	@Produces
-	@Configuration
+	@EEConfiguration
 	public InputStream getInputStream(InjectionPoint injectionPoint) {
 		// get configuration instance
 		ConfigurationWrapper wrapper = this.getConfigurationWrapper(injectionPoint);
@@ -60,7 +60,7 @@ public class InputStreamConfigurationProducer extends AbstractConfigurationProdu
 	}
 	
 	@Produces
-	@Configuration
+	@EEConfiguration
 	public List<InputStream> getInputStreams(InjectionPoint injectionPoint) {
 		// get configuration instance
 		ConfigurationWrapper wrapper = this.getConfigurationWrapper(injectionPoint);
