@@ -5,6 +5,7 @@ import javax.inject.Inject;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.github.chrisruffalo.eeconfig.annotations.EEFallbackComponent;
 import com.github.chrisruffalo.eeconfig.source.ISource;
 import com.github.chrisruffalo.eeconfig.source.impl.UnfoundSource;
 
@@ -16,6 +17,7 @@ import com.github.chrisruffalo.eeconfig.source.impl.UnfoundSource;
  * @author Chris Ruffalo
  *
  */
+@EEFallbackComponent
 @ApplicationScoped
 public class MultiLocator extends BaseLocator {
 

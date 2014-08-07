@@ -12,6 +12,7 @@ import javax.enterprise.util.Nonbinding;
 
 import com.github.chrisruffalo.eeconfig.strategy.locator.Locator;
 import com.github.chrisruffalo.eeconfig.strategy.locator.MultiLocator;
+import com.github.chrisruffalo.eeconfig.strategy.locator.NullLocator;
 
 /**
  * A source is an annotation that describes a unit of configuration.
@@ -59,5 +60,5 @@ public @interface Source {
 	 * @return
 	 */
 	@Nonbinding
-	Class<? extends Locator> locator() default MultiLocator.class;
+	Class<? extends Locator> locator() default NullLocator.class;
 }

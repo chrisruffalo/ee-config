@@ -6,11 +6,12 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Default;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.github.chrisruffalo.eeconfig.annotations.EEFallbackComponent;
 
 /**
  * Default implementation of the property resolver that can
@@ -20,7 +21,7 @@ import org.slf4j.LoggerFactory;
  * @author Chris Ruffalo
  *
  */
-@Default
+@EEFallbackComponent
 @ApplicationScoped
 public class DefaultPropertyResolver implements PropertyResolver {
 	

@@ -9,8 +9,9 @@
 
 	<!-- configuration is verbose as well -->
     <logger name="ch.qos" level="ERROR" additivity="false"/>
+    <logger name="org.jboss.weld" level="INFO" additivity="false"/>
 
-	<root level="info">
+	<root level="debug">
 		<appender-ref ref="STDOUT" />
 	</root>
 </configuration>

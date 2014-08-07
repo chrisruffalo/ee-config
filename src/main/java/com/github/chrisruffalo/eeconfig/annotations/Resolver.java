@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 
 import javax.enterprise.util.Nonbinding;
 
-import com.github.chrisruffalo.eeconfig.strategy.property.DefaultPropertyResolver;
+import com.github.chrisruffalo.eeconfig.strategy.property.NullResolver;
 import com.github.chrisruffalo.eeconfig.strategy.property.PropertyResolver;
 
 /**
@@ -35,7 +35,7 @@ public @interface Resolver {
 	 * @return the class that implements the property resolver behavior
 	 */
 	@Nonbinding
-	Class<? extends PropertyResolver> impl() default DefaultPropertyResolver.class;
+	Class<? extends PropertyResolver> impl() default NullResolver.class;
 	
 	/**
 	 * Uses Apache Commons Configuration to load more properties into the property resolver

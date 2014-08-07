@@ -22,8 +22,8 @@ import com.github.chrisruffalo.eeconfig.strategy.locator.Locator;
 import com.github.chrisruffalo.eeconfig.strategy.locator.NullLocator;
 import com.github.chrisruffalo.eeconfig.strategy.property.PropertyResolver;
 import com.github.chrisruffalo.eeconfig.wrapper.ConfigurationWrapper;
-import com.github.chrisruffalo.eeconfig.wrapper.WrapperFactory;
 import com.github.chrisruffalo.eeconfig.wrapper.ResolverWrapper;
+import com.github.chrisruffalo.eeconfig.wrapper.WrapperFactory;
 
 /**
  * Implements shared logic for loading configuration files
@@ -108,10 +108,10 @@ public abstract class AbstractConfigurationProducer {
 	 */
 	private ISource resloveSource(Source source, PropertyResolver resolver, Map<Object, Object> bootstrapMap, Map<Object, Object> defaultMap) {
 		Class<? extends Locator> locatorClass = source.locator();
-		if(locatorClass == null) {
-			locatorClass = NullLocator.class;
+		if(NullLocator.class.equals(locatorClass)) {
+			locatorClass = null;
 		}
-		Locator locator = this.beanResolver.resolveBeanWithDefaultClass(locatorClass, NullLocator.class);
+		Locator locator = this.beanResolver.resolveBean(Locator.class, locatorClass);
 		this.logger.trace("Using locator: '{}'", locator.getClass().getName());
 		
 		// resolve path if enabled

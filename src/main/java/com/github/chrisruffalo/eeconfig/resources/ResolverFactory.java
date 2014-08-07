@@ -11,15 +11,15 @@ import javax.inject.Inject;
 import org.apache.commons.configuration.ConfigurationMap;
 import org.slf4j.Logger;
 
-import com.github.chrisruffalo.eeconfig.annotations.EELogging;
 import com.github.chrisruffalo.eeconfig.annotations.DefaultProperty;
+import com.github.chrisruffalo.eeconfig.annotations.EELogging;
 import com.github.chrisruffalo.eeconfig.annotations.Resolver;
 import com.github.chrisruffalo.eeconfig.resources.configuration.CommonsConfigurationProducer;
-import com.github.chrisruffalo.eeconfig.strategy.property.DefaultPropertyResolver;
+import com.github.chrisruffalo.eeconfig.strategy.property.NullResolver;
 import com.github.chrisruffalo.eeconfig.strategy.property.PropertyResolver;
 import com.github.chrisruffalo.eeconfig.wrapper.ConfigurationWrapper;
-import com.github.chrisruffalo.eeconfig.wrapper.WrapperFactory;
 import com.github.chrisruffalo.eeconfig.wrapper.ResolverWrapper;
+import com.github.chrisruffalo.eeconfig.wrapper.WrapperFactory;
 
 @ApplicationScoped
 public class ResolverFactory {
@@ -45,14 +45,14 @@ public class ResolverFactory {
 		PropertyResolver resolver = null;
 		
 		// use the impl class to get the property resolver
-		Class<? extends PropertyResolver> propertyResolverClass = resolverAnnotation.impl();
-		if(propertyResolverClass == null) {
-			this.logger.debug("No alternate property resolver provided, using default");
-			propertyResolverClass = DefaultPropertyResolver.class;
+		Class<? extends PropertyResolver> requestedPropertyResolverClass = resolverAnnotation.impl();
+		if(requestedPropertyResolverClass == null || NullResolver.class.equals(requestedPropertyResolverClass)) {
+			this.logger.trace("No alternate property resolver provided, using null to force fallback");
+			requestedPropertyResolverClass = null;
 		} else {
-			this.logger.debug("Requesting alternate property resolver: {}", propertyResolverClass.getName());
+			this.logger.trace("Requesting alternate property resolver: {}", requestedPropertyResolverClass.getName());
 		}
-		resolver = this.beanResolver.resolveBeanWithDefaultClass(propertyResolverClass, DefaultPropertyResolver.class);
+		resolver = this.beanResolver.resolveBean(PropertyResolver.class, requestedPropertyResolverClass);
 		
 		return resolver;
 	}
