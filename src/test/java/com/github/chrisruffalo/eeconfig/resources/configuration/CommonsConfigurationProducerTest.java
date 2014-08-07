@@ -286,4 +286,30 @@ public class CommonsConfigurationProducerTest {
 		Assert.assertEquals("three", properties.getString("three"));
 		Assert.assertEquals("false", properties.getString("minor"));
 	}
+	
+	/**
+     * Test that the INI properties work
+     * 
+     * @param properties
+     */
+    @Test
+    @Inject
+    public void testIni(           
+        @Configuration(
+            sources={
+                @Source(value="resource:ini/tree.ini"),
+            }
+        ) 
+        org.apache.commons.configuration.Configuration properties) 
+    {
+        Assert.assertNotNull(properties);
+        // this one has content
+        Assert.assertFalse(properties.isEmpty());
+        // check content
+        Assert.assertEquals("thing", properties.getString("default"));
+        Assert.assertEquals("pine", properties.getString("pine.name"));
+        Assert.assertEquals("apple", properties.getString("apple.name"));
+        Assert.assertEquals("cone", properties.getString("cone.name", "cone"));
+        Assert.assertNull(properties.getString("cone.name"));
+    }
 }

@@ -79,6 +79,8 @@ public class MimeGuesser {
 				type = SupportedType.JSON;
 			} else if(typeString.contains("yaml")) {
 				type = SupportedType.YAML;
+			} else if(typeString.contains("ini")) {
+			    type = SupportedType.INI;
 			}
 		} catch (IOException e) {
 			// show an error

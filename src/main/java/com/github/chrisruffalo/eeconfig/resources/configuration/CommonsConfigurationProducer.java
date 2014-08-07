@@ -10,15 +10,18 @@ import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
 
+import org.apache.commons.configuration.AbstractConfiguration;
 import org.apache.commons.configuration.CombinedConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.FileConfiguration;
+import org.apache.commons.configuration.HierarchicalINIConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.configuration.tree.OverrideCombiner;
 import org.slf4j.Logger;
 
-import com.github.chrisruffalo.eeconfig.annotations.Logging;
 import com.github.chrisruffalo.eeconfig.annotations.Configuration;
+import com.github.chrisruffalo.eeconfig.annotations.Logging;
 import com.github.chrisruffalo.eeconfig.mime.MimeGuesser;
 import com.github.chrisruffalo.eeconfig.mime.SupportedType;
 import com.github.chrisruffalo.eeconfig.source.ISource;
@@ -85,20 +88,13 @@ public class CommonsConfigurationProducer extends AbstractConfigurationProducer 
 			// supported mime types
 			if(SupportedType.XML.equals(type)) {
 				XMLConfiguration xmlConfiguration = new XMLConfiguration();
-				try {
-					xmlConfiguration.load(stream);
-					combined.addConfiguration(xmlConfiguration);
-				} catch(ConfigurationException e) {
-					this.logger.error("An error occurred while reading XML properties: {}", e.getMessage());	
-				}
-			} else {
+				this.loadAndAdd(stream, xmlConfiguration, combined);
+			} else if(SupportedType.INI.equals(type)) {
+			    HierarchicalINIConfiguration iniConfiguration = new HierarchicalINIConfiguration();
+                this.loadAndAdd(stream, iniConfiguration, combined);
+            } else {
 				PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration();
-				try {
-					propertiesConfiguration.load(stream);
-					combined.addConfiguration(propertiesConfiguration);
-				} catch (ConfigurationException e) {
-					this.logger.error("An error occurred while reading properties: {}", e.getMessage());
-				}				
+				this.loadAndAdd(stream, propertiesConfiguration, combined);				
 			}
 			
 			// close stream
@@ -115,5 +111,21 @@ public class CommonsConfigurationProducer extends AbstractConfigurationProducer 
 		}		
 		// return configuration
 		return combined;
+	}
+	
+	private void loadAndAdd(InputStream toLoad, AbstractConfiguration abstractConfiguration, CombinedConfiguration combined) {
+	    if(abstractConfiguration == null) {
+	        return;
+	    }
+	        
+        try {
+            if(abstractConfiguration instanceof FileConfiguration) {
+                ((FileConfiguration)abstractConfiguration).load(toLoad);
+            }
+            combined.addConfiguration(abstractConfiguration);
+        } catch (ConfigurationException e) {
+            this.logger.error("An error occurred while reading properties: {}", e.getMessage());
+        }       
+
 	}
 }

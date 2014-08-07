@@ -10,6 +10,7 @@ public enum SupportedType {
 	XML,
 	TEXT,
 	YAML,
-	JSON
+	JSON,
+	INI
 	;
 }
