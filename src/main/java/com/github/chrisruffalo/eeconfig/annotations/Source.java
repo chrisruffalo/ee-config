@@ -10,6 +10,7 @@ import java.lang.annotation.Target;
 
 import javax.enterprise.util.Nonbinding;
 
+import com.github.chrisruffalo.eeconfig.mime.SupportedType;
 import com.github.chrisruffalo.eeconfig.strategy.locator.Locator;
 import com.github.chrisruffalo.eeconfig.strategy.locator.MultiLocator;
 import com.github.chrisruffalo.eeconfig.strategy.locator.NullLocator;
@@ -49,6 +50,15 @@ public @interface Source {
 	 */
 	@Nonbinding
 	boolean resolve() default false;
+	
+	/**
+	 * Allows type-overrides so that a .conf file can
+	 * have an alternate format like INI or XML
+	 * 
+	 * @return
+	 */
+	@Nonbinding
+	SupportedType type() default SupportedType.AUTO;
 	
 	/**
 	 * The {@link Locator} implementation used for finding

@@ -2,6 +2,7 @@ package com.github.chrisruffalo.eeconfig.source.impl;
 
 import java.io.InputStream;
 
+import com.github.chrisruffalo.eeconfig.mime.SupportedType;
 import com.github.chrisruffalo.eeconfig.source.ISource;
 
 /**
@@ -14,6 +15,9 @@ public abstract class BaseSource implements ISource {
 
 	// the path to the source
 	private String path;
+	
+	// the type if one is provided (defaults to AUTO otherwise)
+	private SupportedType type = SupportedType.AUTO;
 	
 	/**
 	 * {@inheritDoc}
@@ -49,7 +53,24 @@ public abstract class BaseSource implements ISource {
 		this.path = path;
 	}
 
+	
 	/**
+	 * {@inheritDoc}
+	 */
+	public SupportedType type() {
+        return type;
+    }
+
+	/**
+	 * Set the type of the file source
+	 * 
+	 * @param type
+	 */
+    public void type(SupportedType type) {
+        this.type = type;
+    }
+
+    /**
 	 * {@inheritDoc}
 	 */
 	@Override

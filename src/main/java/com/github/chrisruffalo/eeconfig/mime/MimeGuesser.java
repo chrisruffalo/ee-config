@@ -31,6 +31,12 @@ public class MimeGuesser {
 		// create logger
 		Logger logger = LoggerFactory.getLogger(MimeGuesser.class);
 		
+		// if a source is provided and the type is both not null and not auto then return
+		// the type and skip the guessing, assuming the user knows what is up
+		if(source != null && !SupportedType.AUTO.equals(source.type()) && null != source.type()) {
+		    return source.type();
+		}
+		
 		// the type is assumed to be text
 		SupportedType type = SupportedType.TEXT;
 		

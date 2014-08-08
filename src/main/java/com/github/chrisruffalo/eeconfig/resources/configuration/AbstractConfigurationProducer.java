@@ -119,12 +119,17 @@ public abstract class AbstractConfigurationProducer {
 		if(resolver != null && source.resolve()) {
 			path = resolver.resolveProperties(path, bootstrapMap, defaultMap);
 		}
-		
+				
 		// log path
 		this.logger.trace("Looking for source at path: '{}'", path);
 		
 		// locate
 		ISource foundSource = locator.locate(path);
+		
+		// set mime from provided
+		if(foundSource != null) {
+		    foundSource.type(source.type());
+		}        
 		
 		// log results
 		this.logger.trace("Source: '{}' (using locator '{}')", foundSource, locator.getClass().getName());

@@ -109,6 +109,10 @@ public class CommonsConfigurationProducer extends AbstractConfigurationProducer 
 				break;
 			}
 		}		
+		
+		// we shouldn't be doing this, just return null/empty string or something
+		combined.setThrowExceptionOnMissing(false);
+		
 		// return configuration
 		return combined;
 	}
@@ -122,7 +126,18 @@ public class CommonsConfigurationProducer extends AbstractConfigurationProducer 
             if(abstractConfiguration instanceof FileConfiguration) {
                 ((FileConfiguration)abstractConfiguration).load(toLoad);
             }
-            combined.addConfiguration(abstractConfiguration);
+            // never do this
+            abstractConfiguration.setThrowExceptionOnMissing(false);
+            
+            // muck with configuration to make sure it won't throw spurious errors
+            // at implementors
+            try {
+                if(!abstractConfiguration.isEmpty()) {
+                    combined.addConfiguration(abstractConfiguration);                    
+                }
+            } catch (Exception ex) {
+                // skip
+            }
         } catch (ConfigurationException e) {
             this.logger.error("An error occurred while reading properties: {}", e.getMessage());
         }       
