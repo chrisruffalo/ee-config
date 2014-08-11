@@ -28,10 +28,10 @@ public class BeanResolver {
 	private BeanManager manager;
 	
 	/**
-	 * Resolve managed bean for given type
+	 * Resolve managed bean for given type, with an optional target type
 	 * 
 	 * @param rootTypeToResolve
-	 * @param defaultType
+	 * @param targetType
 	 * @return
 	 */
 	@SuppressWarnings({ "unchecked", "serial" })
@@ -48,9 +48,9 @@ public class BeanResolver {
 		// candidates place-holder
 		Set<Bean<?>> candidates = null;
 
-	      // try and directly resolve the target type if one exists
+	    // try and directly resolve the target type if one exists
 		if(targetType != null) {
-		    candidates = this.manager.getBeans(targetType);
+		    candidates = this.manager.getBeans(targetType, new AnnotationLiteral<Any>(){});
     		if(!candidates.isEmpty()) {
     		    foundBean = candidates.iterator().next();
     		}
