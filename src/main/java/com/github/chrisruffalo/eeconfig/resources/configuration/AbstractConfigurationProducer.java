@@ -71,6 +71,9 @@ public abstract class AbstractConfigurationProducer {
 			throw new IllegalArgumentException("A non-null Configuration annotation must be provided");
 		}
 		
+		// debug/trace
+		this.logger.trace("Creating new resolver wrapper for : {}", configuration.getClass().getName());
+		
 		// create resolver from configuration annotation's resolver element
 		ResolverWrapper resolverWrapper = configuration.resolver();
 		PropertyResolver resolver = this.resolverFactory.createPropertyResolver(resolverWrapper);
