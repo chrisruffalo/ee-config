@@ -42,20 +42,19 @@ public class BeanResolver {
 			return null;
 		}
 		
+		// used for marking a bean as found
 		Bean<?> foundBean = null;
 		
-		// get candidate resolve types
-		Set<Bean<?>> candidates = this.manager.getBeans(rootTypeToResolve);
-		
-		// search through candidates for target type
+		// candidates place-holder
+		Set<Bean<?>> candidates = null;
+
+	      // try and directly resolve the target type if one exists
 		if(targetType != null) {
-    		for(Bean<?> candidate : candidates) {
-    		    if(targetType.equals(candidate.getBeanClass())) {
-    		        foundBean = candidate;
-    		        break;
-    		    }
+		    candidates = this.manager.getBeans(targetType);
+    		if(!candidates.isEmpty()) {
+    		    foundBean = candidates.iterator().next();
     		}
-		}
+		}		
 		
 		// if no bean (of target type) was found
 		// then we need to start searching for
@@ -77,7 +76,7 @@ public class BeanResolver {
 		
 		this.logger.trace("Requesting resolution on: {}", rootTypeToResolve.getName());
 		
-		// get candidate
+		// get/create candidate
 		Bean<?> bean = foundBean;
 		CreationalContext<?> context = this.manager.createCreationalContext(bean);
 		Type type = (Type) bean.getTypes().iterator().next();
