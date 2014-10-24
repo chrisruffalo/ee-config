@@ -89,12 +89,14 @@ public class DefaultPropertyResolver implements PropertyResolver {
 					continue;
 				}
 	
-				// get the property (first from bootstrap, then from system properties, then from default)
+				// get the property (first from bootstrap, then from system properties, environment, then from default)
 				String property = null;
 				if(bootstrapProperties != null && bootstrapProperties.containsKey(token)) {
 					property = String.valueOf(bootstrapProperties.get(token));
 				} else if(System.getProperties().containsKey(token)) {
 					property = System.getProperty(token);
+				} else if(System.getenv().containsKey(token)) {
+				    property = System.getenv().get(token);
 				} else if(defaultProperties != null && defaultProperties.containsKey(token)) {
 					property = String.valueOf(defaultProperties.get(token));
 				}
