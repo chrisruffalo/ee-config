@@ -26,8 +26,8 @@ public class FileLocator extends BaseLocator {
 			return new UnfoundSource();
 		}
 		// create file pointer from given path
-		File file = new File(path);
-		FileSource fileSource = new FileSource(file);
+		final File file = new File(path);
+		final FileSource fileSource = new FileSource(file);
 		if(!fileSource.available()) {
 			return new UnfoundSource(path);
 		}

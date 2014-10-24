@@ -22,8 +22,12 @@ public class FileSource extends BaseSource {
 	 * 
 	 * @param file
 	 */
-	public FileSource(File file) {
+	public FileSource(final File file) {
+	    // store file
 		this.file = file;
+		
+		// store path
+		this.setPath(file.getAbsolutePath());
 	}
 	
 	/**
@@ -35,7 +39,7 @@ public class FileSource extends BaseSource {
 		try {
 			stream = new FileInputStream(file);
 		} catch (FileNotFoundException e) {
-			stream = new ByteArrayInputStream(new byte[0]);
+			return new ByteArrayInputStream(new byte[0]);
 		}
 
 		// create buffered stream
@@ -49,6 +53,6 @@ public class FileSource extends BaseSource {
 	 */
 	@Override
 	public boolean available() {
-		return file != null && file.exists() && file.isFile();
+		return this.file != null && this.file.exists() && this.file.isFile();
 	}
 }

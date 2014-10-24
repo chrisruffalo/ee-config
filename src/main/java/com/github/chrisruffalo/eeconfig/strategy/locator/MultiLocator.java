@@ -42,9 +42,9 @@ public class MultiLocator extends BaseLocator {
 			return new UnfoundSource(path);
 		}		
 		// get a local version of the path for comparing
-		String localPath = path.toLowerCase().trim();
+		final String localPath = path.toLowerCase().trim();
 		// has resource marker
-		if(localPath.startsWith("resource:")) {
+		if(localPath.startsWith(MultiLocator.RESOURCE)) {
 			path = StringUtils.removeStart(path, MultiLocator.RESOURCE);
 			return this.rLocator.locate(path);
 		}

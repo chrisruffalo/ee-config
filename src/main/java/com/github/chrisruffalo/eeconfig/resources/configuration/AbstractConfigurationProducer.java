@@ -94,7 +94,7 @@ public abstract class AbstractConfigurationProducer {
 			if(found != null) {
 				foundSources.add(found);
 				if(configuration.log() && this.logger.isInfoEnabled()) {
-				    this.logger.info("source '{}' => '{}' (availalble: {})", source.value(), found.getPath(), found.available());
+				    this.logger.info("source '{}' => '{}' (availalble: {}, class={})", source.value(), found.getPath(), found.available(), found.getClass().getName());
 				}
 			}
 		}
@@ -119,7 +119,7 @@ public abstract class AbstractConfigurationProducer {
 		if(NullLocator.class.equals(locatorClass)) {
 			locatorClass = null;
 		}
-		Locator locator = this.beanResolver.resolveBean(Locator.class, locatorClass);
+		final Locator locator = this.beanResolver.resolveBean(Locator.class, locatorClass);
 		this.logger.trace("Using locator: '{}'", locator.getClass().getName());
 		
 		// resolve path if enabled
@@ -132,7 +132,7 @@ public abstract class AbstractConfigurationProducer {
 		this.logger.trace("Looking for source at path: '{}'", path);
 		
 		// locate
-		ISource foundSource = locator.locate(path);
+		final ISource foundSource = locator.locate(path);
 		
 		// set mime from provided
 		if(foundSource != null) {
