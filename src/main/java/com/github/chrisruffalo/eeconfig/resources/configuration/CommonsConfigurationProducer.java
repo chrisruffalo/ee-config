@@ -12,6 +12,7 @@ import javax.inject.Inject;
 
 import org.apache.commons.configuration.AbstractConfiguration;
 import org.apache.commons.configuration.CombinedConfiguration;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.FileConfiguration;
 import org.apache.commons.configuration.HierarchicalINIConfiguration;
@@ -63,13 +64,16 @@ public class CommonsConfigurationProducer extends AbstractConfigurationProducer 
 	 * @param wrapper the annotation to use for configuring
 	 * @return the common configuration values
 	 */
-	public org.apache.commons.configuration.Configuration getConfiguration(ConfigurationWrapper wrapper) {
+	public Configuration getConfiguration(ConfigurationWrapper wrapper) {
 		// get input streams
 		List<ISource> sources = this.locate(wrapper);
 		
 		// create configuration combiner
 		OverrideCombiner combiner = new OverrideCombiner();
 		CombinedConfiguration combined = new CombinedConfiguration(combiner);
+		
+		boolean first = true;
+		final StringBuilder chain = new StringBuilder("[");
 		
 		// combine configurations
 		for(ISource source : sources) {
@@ -104,11 +108,27 @@ public class CommonsConfigurationProducer extends AbstractConfigurationProducer 
 				this.logger.trace("Could not close old stream: {}", stream);
 			}
 			
+			// loaded from
+			final String path = source.getPath();
+			if(path != null && !path.isEmpty()) {
+    			if(!first) {
+    			    chain.append(", ");
+    			}
+    			first = false;
+    			
+    			chain.append(path);
+			}
+			
 			// leave on first loop if merge is on
 			if(!wrapper.merge()) {
 				break;
 			}
 		}		
+		
+		// close chain
+		chain.append("]");
+		// save providence property
+		combined.addProperty(AbstractConfigurationProducer.EE_CONFIG_RESOURCE_CHAIN_PROPERTY, chain.toString());
 		
 		// we shouldn't be doing this, just return null/empty string or something
 		combined.setThrowExceptionOnMissing(false);

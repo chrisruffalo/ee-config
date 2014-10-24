@@ -11,6 +11,7 @@ import java.io.OutputStream;
 
 import javax.inject.Inject;
 
+import org.apache.commons.configuration.Configuration;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -103,8 +104,9 @@ public class CommonsConfigurationProducerTest {
 	 */
 	@Test
 	@Inject
-	public void testEmptyPaths(@EEConfiguration org.apache.commons.configuration.Configuration properties) {
+	public void testEmptyPaths(@EEConfiguration Configuration properties) {
 		Assert.assertNotNull(properties);
+		properties.clearProperty(AbstractConfigurationProducer.EE_CONFIG_RESOURCE_CHAIN_PROPERTY);
 		Assert.assertTrue(properties.isEmpty());
 	}
 	
@@ -122,9 +124,10 @@ public class CommonsConfigurationProducerTest {
 					@Source(value="resource:/bad/path/file.properties")
 				}
 			) 
-			org.apache.commons.configuration.Configuration properties
+			Configuration properties
 		) {
 		Assert.assertNotNull(properties);
+		properties.clearProperty(AbstractConfigurationProducer.EE_CONFIG_RESOURCE_CHAIN_PROPERTY);
 		Assert.assertTrue(properties.isEmpty());
 	}
 	
@@ -144,7 +147,7 @@ public class CommonsConfigurationProducerTest {
 				@Source(value="resource:properties/priority3.properties"),
 			}
 		) 
-		org.apache.commons.configuration.Configuration properties) 
+		Configuration properties) 
 	{
 		Assert.assertNotNull(properties);
 		// this one has content
@@ -176,7 +179,7 @@ public class CommonsConfigurationProducerTest {
 				@Source(value="resource:properties/priority3.properties"),
 			}
 		) 
-		org.apache.commons.configuration.Configuration properties) 
+		Configuration properties) 
 	{
 		Assert.assertNotNull(properties);
 		// this one has content
@@ -205,7 +208,7 @@ public class CommonsConfigurationProducerTest {
 			},
 			merge = true
 		) 
-		org.apache.commons.configuration.Configuration properties) 
+		Configuration properties) 
 	{
 		Assert.assertNotNull(properties);
 		// this one has content
@@ -241,7 +244,7 @@ public class CommonsConfigurationProducerTest {
 			},
 			merge = true
 		) 
-		org.apache.commons.configuration.Configuration properties) 
+		Configuration properties) 
 	{
 		Assert.assertNotNull(properties);
 		// this one has content
@@ -273,7 +276,7 @@ public class CommonsConfigurationProducerTest {
 			},
 			merge = true
 		) 
-		org.apache.commons.configuration.Configuration properties) 
+		Configuration properties) 
 	{
 		Assert.assertNotNull(properties);
 		// this one has content
@@ -300,7 +303,7 @@ public class CommonsConfigurationProducerTest {
                 @Source(value="resource:ini/tree.ini"),
             }
         ) 
-        org.apache.commons.configuration.Configuration properties) 
+        Configuration properties) 
     {
         Assert.assertNotNull(properties);
         // this one has content

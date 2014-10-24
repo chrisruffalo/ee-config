@@ -32,6 +32,8 @@ import com.github.chrisruffalo.eeconfig.wrapper.WrapperFactory;
  *
  */
 public abstract class AbstractConfigurationProducer {
+    
+    public static final String EE_CONFIG_RESOURCE_CHAIN_PROPERTY = "com.github.chrisruffalo.eeconfig.resources.configuration.ResourceChainProperty";
 	
 	@Inject
 	@EELogging
