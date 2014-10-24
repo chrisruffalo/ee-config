@@ -94,7 +94,7 @@ public abstract class AbstractConfigurationProducer {
 			if(found != null) {
 				foundSources.add(found);
 				if(configuration.log() && this.logger.isInfoEnabled()) {
-				    this.logger.info("Resolved '{}' into a source '{}' ({})", source.value(), found.getPath(), found.available());
+				    this.logger.info("source '{}' => '{}' (availalble: {})", source.value(), found.getPath(), found.available());
 				}
 			}
 		}
