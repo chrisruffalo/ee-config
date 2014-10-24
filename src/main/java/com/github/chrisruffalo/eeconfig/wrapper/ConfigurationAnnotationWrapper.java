@@ -47,4 +47,12 @@ public class ConfigurationAnnotationWrapper implements ConfigurationWrapper {
 		return new ResolverAnnotationWrapper(this.delegate.resolver());
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+    @Override
+    public boolean log() {
+        return this.delegate.log();
+    }
+
 }

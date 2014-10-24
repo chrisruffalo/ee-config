@@ -30,6 +30,14 @@ import javax.inject.Qualifier;
 @Retention(RUNTIME)
 @Target({ METHOD, FIELD, PARAMETER, TYPE })
 public @interface Bootstrap {
+    
+    /**
+     * Log each configuration element as it is <strong>resolved</strong>.
+     * 
+     * @return
+     */
+    @Nonbinding
+    boolean log() default false;
 	
 	/**
 	 * List of configuration sources that should be used to create

@@ -40,6 +40,14 @@ public class BootstrapAnnotationWrapper implements ConfigurationWrapper {
 	}
 	
 	/**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean log() {
+        return this.delegate.log();
+    }
+	
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override

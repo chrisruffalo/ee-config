@@ -26,6 +26,14 @@ import javax.inject.Qualifier;
 @Target({ METHOD, FIELD, PARAMETER, TYPE })
 public @interface EEConfiguration {
 	
+    /**
+     * Log each configuration element as it is <strong>resolved</strong>.
+     * 
+     * @return
+     */
+    @Nonbinding
+    boolean log() default false;
+    
 	/**
 	 * List of configuration sources that should be used to create
 	 * the configuration instance.  The highest priority {@link Source}

@@ -13,6 +13,13 @@ import com.github.chrisruffalo.eeconfig.annotations.Source;
  */
 public interface ConfigurationWrapper {
 
+    /**
+     * Return the log() from the configuration-style element
+     * 
+     * @return
+     */
+    boolean log();
+    
 	/**
 	 * Return the sources() from the configuration-style element
 	 * 

@@ -93,6 +93,9 @@ public abstract class AbstractConfigurationProducer {
 			ISource found = this.resloveSource(source, resolver, bootstrapMap, defaultMap);
 			if(found != null) {
 				foundSources.add(found);
+				if(configuration.log() && this.logger.isInfoEnabled()) {
+				    this.logger.info("Resolved '{}' into a source '{}' ({})", source.value(), found.getPath(), found.available());
+				}
 			}
 		}
 		
